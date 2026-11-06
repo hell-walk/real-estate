@@ -1,0 +1,162 @@
+{
+  "sofa_02": {
+    "file": "sofa_02/sofa_02_1k.gltf",
+    "name": "Sofa 02",
+    "authors": [
+      "Kirill Sannikov"
+    ],
+    "source": "https://polyhaven.com/a/sofa_02",
+    "licence": "CC0",
+    "bytes": 427171
+  },
+  "modern_arm_chair_01": {
+    "file": "modern_arm_chair_01/modern_arm_chair_01_1k.gltf",
+    "name": "Modern Arm Chair 01",
+    "authors": [
+      "Vibrant Nordic"
+    ],
+    "source": "https://polyhaven.com/a/modern_arm_chair_01",
+    "licence": "CC0",
+    "bytes": 2698032
+  },
+  "dining_chair_02": {
+    "file": "dining_chair_02/dining_chair_02_1k.gltf",
+    "name": "Dining Chair 02",
+    "authors": [
+      "James Ray Cock"
+    ],
+    "source": "https://polyhaven.com/a/dining_chair_02",
+    "licence": "CC0",
+    "bytes": 921075
+  },
+  "wooden_table_02": {
+    "file": "wooden_table_02/wooden_table_02_1k.gltf",
+    "name": "Wooden Table 02",
+    "authors": [
+      "Serhii Khromov"
+    ],
+    "source": "https://polyhaven.com/a/wooden_table_02",
+    "licence": "CC0",
+    "bytes": 485316
+  },
+  "modern_coffee_table_01": {
+    "file": "modern_coffee_table_01/modern_coffee_table_01_1k.gltf",
+    "name": "Modern Coffee Table 01",
+    "authors": [
+      "Amin"
+    ],
+    "source": "https://polyhaven.com/a/modern_coffee_table_01",
+    "licence": "CC0",
+    "bytes": 1331297
+  },
+  "modern_wooden_cabinet": {
+    "file": "modern_wooden_cabinet/modern_wooden_cabinet_1k.gltf",
+    "name": "Modern Wooden Cabinet",
+    "authors": [
+      "Patrik Pangerl"
+    ],
+    "source": "https://polyhaven.com/a/modern_wooden_cabinet",
+    "licence": "CC0",
+    "bytes": 2855522
+  },
+  "GothicBed_01": {
+    "file": "GothicBed_01/GothicBed_01_1k.gltf",
+    "name": "Gothic Bed 01",
+    "authors": [
+      "Kirill Sannikov"
+    ],
+    "source": "https://polyhaven.com/a/GothicBed_01",
+    "licence": "CC0",
+    "bytes": 1155213
+  },
+  "painted_wooden_cabinet": {
+    "file": "painted_wooden_cabinet/painted_wooden_cabinet_1k.gltf",
+    "name": "Painted Wooden Cabinet",
+    "authors": [
+      "Kirill Sannikov"
+    ],
+    "source": "https://polyhaven.com/a/painted_wooden_cabinet",
+    "licence": "CC0",
+    "bytes": 1861779
+  },
+  "wooden_display_shelves_01": {
+    "file": "wooden_display_shelves_01/wooden_display_shelves_01_1k.gltf",
+    "name": "Wooden Display Shelves 01",
+    "authors": [
+      "James Ray Cock"
+    ],
+    "source": "https://polyhaven.com/a/wooden_display_shelves_01",
+    "licence": "CC0",
+    "bytes": 471129
+  },
+  "painted_wooden_table": {
+    "file": "painted_wooden_table/painted_wooden_table_1k.gltf",
+    "name": "Painted Wooden Table",
+    "authors": [
+      "Kirill Sannikov"
+    ],
+    "source": "https://polyhaven.com/a/painted_wooden_table",
+    "licence": "CC0",
+    "bytes": 1779493
+  },
+  "potted_plant_02": {
+    "file": "potted_plant_02/potted_plant_02_1k.gltf",
+    "name": "Potted Plant 02",
+    "authors": [
+      "Rico Cilliers"
+    ],
+    "source": "https://polyhaven.com/a/potted_plant_02",
+    "licence": "CC0",
+    "bytes": 2634698
+  },
+  "potted_plant_04": {
+    "file": "potted_plant_04/potted_plant_04_1k.gltf",
+    "name": "Potted Plant 04",
+    "authors": [
+      "James Ray Cock"
+    ],
+    "source": "https://polyhaven.com/a/potted_plant_04",
+    "licence": "CC0",
+    "bytes": 2122625
+  },
+  "side_table_01": {
+    "file": "side_table_01/side_table_01_1k.gltf",
+    "name": "Side Table 01",
+    "authors": [
+      "James Ray Cock"
+    ],
+    "source": "https://polyhaven.com/a/side_table_01",
+    "licence": "CC0",
+    "bytes": 505268
+  },
+  "Ottoman_01": {
+    "file": "Ottoman_01/Ottoman_01_1k.gltf",
+    "name": "Ottoman 01",
+    "authors": [
+      "Caspian Fortune"
+    ],
+    "source": "https://polyhaven.com/a/Ottoman_01",
+    "licence": "CC0",
+    "bytes": 652112
+  },
+  "ClassicNightstand_01": {
+    "file": "ClassicNightstand_01/ClassicNightstand_01_1k.gltf",
+    "name": "Classic Nightstand 01",
+    "authors": [
+      "Kirill Sannikov"
+    ],
+    "source": "https://polyhaven.com/a/ClassicNightstand_01",
+    "licence": "CC0",
+    "bytes": 444940
+  },
+  "modern_ceiling_lamp_01": {
+    "file": "modern_ceiling_lamp_01/modern_ceiling_lamp_01_1k.gltf",
+    "name": "Modern Ceiling Lamp 01",
+    "authors": [
+      "James Ray Cock"
+    ],
+    "source": "https://polyhaven.com/a/modern_ceiling_lamp_01",
+    "licence": "CC0",
+    "bytes": 436065
+  }
+}

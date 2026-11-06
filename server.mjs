@@ -17,7 +17,7 @@ import * as pages from './lib/pages.mjs';
 const PORT = Number(process.env.PORT || 4321);
 const ADMIN_USER = process.env.ADMIN_USER || 'lounge';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ridge-2026';
-const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.json': 'application/json', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.ico': 'image/x-icon', '.txt': 'text/plain; charset=utf-8', '.woff2': 'font/woff2', '.xml': 'application/xml', '.csv': 'text/csv; charset=utf-8' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.json': 'application/json', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.ico': 'image/x-icon', '.txt': 'text/plain; charset=utf-8', '.woff2': 'font/woff2', '.xml': 'application/xml', '.csv': 'text/csv; charset=utf-8', '.gltf': 'model/gltf+json', '.bin': 'application/octet-stream' };
 const HTML = TYPES['.html'];
 
 // ---------- rebuild when a source file changed ----------
@@ -80,7 +80,7 @@ async function staticFile(res, path) {
     return send(res, 404, page);
   }
   const type = TYPES[extname(file)] || 'application/octet-stream';
-  const cache = /\.(jpg|jpeg|png|svg|webp|woff2)$/.test(file) ? 'public, max-age=86400' : 'no-store';
+  const cache = /\.(jpg|jpeg|png|svg|webp|woff2|gltf|bin)$/.test(file) ? 'public, max-age=86400' : 'no-store';
   send(res, 200, await readFile(file), type, { 'cache-control': cache });
 }
 
