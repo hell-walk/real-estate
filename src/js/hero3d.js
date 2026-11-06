@@ -97,7 +97,7 @@ function init() {
   const asphaltTex = makeTex(256, (g, s) => speckle(g, s, '#4b494b', 9000, 0.3, 0.12, 2), [40, 2]);
   const pavingTex = makeTex(256, (g, s) => { speckle(g, s, '#908b85', 5000, 0.12, 0.06, 3); g.fillStyle = 'rgba(0,0,0,0.18)'; for (let i = 0; i <= s; i += 64) { g.fillRect(i, 0, 1, s); g.fillRect(0, i, s, 1); } }, [60, 18]);
   const deckTex = makeTex(256, (g, s) => { speckle(g, s, '#dad1c0', 4000, 0.1, 0.05, 3); g.fillStyle = 'rgba(0,0,0,0.15)'; for (let i = 0; i <= s; i += 32) { g.fillRect(i, 0, 1, s); g.fillRect(0, i, s, 1); } }, [8, 5]);
-  const railTex = makeTex(128, (g, s) => { g.clearRect(0, 0, s, s); g.fillStyle = '#3a312b'; g.fillRect(0, 0, s, 6); g.fillRect(0, s - 4, s, 4); for (let x = 2; x < s; x += 14) g.fillRect(x, 0, 3, s); }, [4, 1]);
+  const railTex = makeTex(128, (g, s) => { g.clearRect(0, 0, s, s); g.fillStyle = '#1c1a19'; g.fillRect(0, 0, s, 6); g.fillRect(0, s - 4, s, 4); g.fillRect(0, s / 2 - 1, s, 2); for (let x = 2; x < s; x += 14) g.fillRect(x, 0, 3, s); }, [4, 1]);
   const grilleTex = makeTex(128, (g, s) => { g.clearRect(0, 0, s, s); g.fillStyle = '#2f2a26'; g.fillRect(0, 0, s, 5); for (let x = 2; x < s; x += 12) g.fillRect(x, 0, 3, s); }, [200, 1]);
   const boardTex = (() => {
     const c = document.createElement('canvas'); c.width = 1024; c.height = 224; const g = c.getContext('2d');
@@ -165,12 +165,13 @@ function init() {
   for (let x = -120; x <= 120; x += 12) { pier(x, -35); if (x < 2 || x > 22) pier(x, 35); }
   for (let z = -23; z <= 23; z += 12) { pier(-120, z); pier(120, z); }
   piers.count = pc; piers.castShadow = shadows; scene.add(piers);
-  const pillarMat = new THREE.MeshStandardMaterial({ color: '#9a5a44', roughness: 0.9 });
+  const pillarMat = new THREE.MeshStandardMaterial({ color: '#f3f0ea', roughness: 0.9 }); // the gate, the canopies and the gatehouse roof are white plaster, as in the photographs
   [[4.5, 35], [19.5, 35]].forEach(([x, z]) => { const p = new THREE.Mesh(new THREE.BoxGeometry(1.4, 5, 1.4), pillarMat); p.position.set(x, 2.5, z); p.castShadow = shadows; scene.add(p); });
   const gateBeam = new THREE.Mesh(new THREE.BoxGeometry(16.4, 0.5, 1.4), pillarMat); gateBeam.position.set(12, 5.3, 35); gateBeam.castShadow = shadows; scene.add(gateBeam);
+  const gateCornice = new THREE.Mesh(new THREE.BoxGeometry(17.6, 0.3, 2.2), pillarMat); gateCornice.position.set(12, 5.7, 35); gateCornice.castShadow = shadows; scene.add(gateCornice); // the moulded cornice over the gate
   const boardSide = new THREE.MeshStandardMaterial({ color: '#1b1613' }), boardFace = new THREE.MeshStandardMaterial({ map: boardTex, roughness: 0.6 });
   const board = new THREE.Mesh(new THREE.BoxGeometry(11, 2.4, 0.3), [boardSide, boardSide, boardSide, boardSide, boardFace, boardFace]);
-  board.position.set(12, 6.8, 35); board.castShadow = shadows; scene.add(board);
+  board.position.set(12, 7.1, 35); board.castShadow = shadows; scene.add(board);
   const leafTex = grilleTex.clone(); leafTex.repeat.set(7, 3); leafTex.needsUpdate = true;
   const gateLeaf = new THREE.Mesh(new THREE.PlaneGeometry(7, 2.4), new THREE.MeshStandardMaterial({ map: leafTex, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.6, metalness: 0.4 }));
   gateLeaf.position.set(5.2 + 3.5 * Math.cos(1.2), 1.4, 35 - 3.5 * Math.sin(1.2)); gateLeaf.rotation.y = -1.2; scene.add(gateLeaf); // one leaf, standing open
@@ -214,18 +215,18 @@ function init() {
 
   // ---------- the three blocks ----------
   const facadeMat = new THREE.MeshStandardMaterial({ map: plasterTex, roughness: 0.92 });
-  const slabMat = new THREE.MeshStandardMaterial({ color: '#8a4f3b', roughness: 0.9 });
-  const coreMat = new THREE.MeshStandardMaterial({ color: '#b4705a', roughness: 0.9 });
-  const balconyMat = new THREE.MeshStandardMaterial({ color: '#cbb89c', roughness: 0.95 });
+  const slabMat = new THREE.MeshStandardMaterial({ color: '#e8e5de', roughness: 0.9 }); // the slab lines and the parapet are white plaster
+  const coreMat = new THREE.MeshStandardMaterial({ color: '#56657a', roughness: 0.9 }); // the core, the lobby band and the wing tips are the slate blue of the built towers
+  const balconyMat = new THREE.MeshStandardMaterial({ color: '#5c6b7e', roughness: 0.95 }); // and so are the balcony fascias
   const railMat = new THREE.MeshStandardMaterial({ map: railTex, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.6, metalness: 0.4 });
-  const frameMat = new THREE.MeshStandardMaterial({ color: '#4a4440', roughness: 0.7 });
+  const frameMat = new THREE.MeshStandardMaterial({ color: '#2f2d2b', roughness: 0.7 });
   const acMat = new THREE.MeshStandardMaterial({ color: '#d9d9d6', roughness: 0.7, metalness: 0.2 });
   const glass = new THREE.MeshStandardMaterial({ color: '#a9c0d2', emissive: '#ffb860', emissiveIntensity: 0, roughness: 0.12, metalness: 0.65, envMapIntensity: 1.1 });
   const blockPos = { C: [-78, 2], B: [-19, 1], A: [40, 2] };
   const records = []; // one per box, in instance order
   const solids = []; // what you cannot walk through: ground floor footprints, in each one's own frame
-  const flatMatrices = [], flatColours = [], slabMatrices = [], winMatrices = [], balcMatrices = [], railMatrices = [], acMatrices = [];
-  const cream = new THREE.Color('#ece3d2'), creamB = new THREE.Color('#e4d9c5'), shopC = new THREE.Color('#7f94a6'), under = new THREE.Color('#6a615a'), lobbyC = new THREE.Color('#c9bca6');
+  const flatMatrices = [], flatColours = [], slabMatrices = [], winMatrices = [], balcMatrices = [], railMatrices = [], acMatrices = [], bandMatrices = [];
+  const cream = new THREE.Color('#f2efe9'), creamB = new THREE.Color('#ebe8e1'), shopC = new THREE.Color('#7f94a6'), under = new THREE.Color('#6a615a'), lobbyC = new THREE.Color('#56657a');
   const place = (fl, bx, bz, local) => new THREE.Matrix4().makeTranslation(bx + fl.cx, 0, bz + fl.cz).multiply(new THREE.Matrix4().makeRotationY(fl.rot)).multiply(local);
   for (const id of ['C', 'B', 'A']) {
     const block = BLOCKS[id], [bx, bz] = blockPos[id];
@@ -256,6 +257,7 @@ function init() {
           }
         }
       }
+      if (fl.tip) bandMatrices.push(place(fl, bx, bz, new THREE.Matrix4().makeTranslation((fl.tipDir || 1) * (fl.len / 2 + 0.1), (base + top) / 2, 0).multiply(new THREE.Matrix4().makeScale(0.2, top - base, 1.5)))); // the blue band up the tip of every wing
       for (let floor = 0; floor <= FLOORS + 1; floor++) slabMatrices.push(place(fl, bx, bz, new THREE.Matrix4().makeTranslation(0, base + floor * FH, 0).multiply(new THREE.Matrix4().makeScale(fl.len + 0.5, 0.24, fl.wid + 0.5)))); // a slab line at every floor, and the roof
       slabMatrices.push(place(fl, bx, bz, new THREE.Matrix4().makeTranslation(0, top + 0.5, 0).multiply(new THREE.Matrix4().makeScale(fl.len + 0.5, 0.9, 0.3)))); // the parapet
     });
@@ -281,6 +283,8 @@ function init() {
   winMatrices.forEach((m, i) => frames.setMatrixAt(i, m)); scene.add(frames);
   const balconies = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), balconyMat, balcMatrices.length);
   balcMatrices.forEach((m, i) => balconies.setMatrixAt(i, m)); balconies.castShadow = shadows; scene.add(balconies);
+  const bands = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), coreMat, bandMatrices.length);
+  bandMatrices.forEach((m, i) => bands.setMatrixAt(i, m)); bands.castShadow = shadows; scene.add(bands);
   const rails = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1), railMat, railMatrices.length);
   railMatrices.forEach((m, i) => rails.setMatrixAt(i, m)); scene.add(rails);
   const acs = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), acMat, acMatrices.length);

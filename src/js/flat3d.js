@@ -119,16 +119,24 @@ function init() {
   const makeTex = (size, draw) => { const c = document.createElement('canvas'); c.width = c.height = size; const g = c.getContext('2d'); draw(g, size); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = aniso; return t; };
   const speckle = (g, size, base, n, dark = 0.08, light = 0.06, w = 2) => { g.fillStyle = base; g.fillRect(0, 0, size, size); for (let i = 0; i < n; i++) { g.fillStyle = trnd() < 0.5 ? `rgba(0,0,0,${(trnd() * dark).toFixed(3)})` : `rgba(255,255,255,${(trnd() * light).toFixed(3)})`; g.fillRect(trnd() * size, trnd() * size, 1 + trnd() * w, 1 + trnd() * w); } };
   const grid = (g, size, step, line, w = 2) => { g.fillStyle = line; for (let i = 0; i <= size; i += step) { g.fillRect(i - w / 2, 0, w, size); g.fillRect(0, i - w / 2, size, w); } };
-  // one tile per floor kind; edge is how many metres one repeat of it covers
+  const vein = (g, s) => { g.strokeStyle = 'rgba(120,110,100,0.16)'; g.lineWidth = 1.5; for (let i = 0; i < 7; i++) { g.beginPath(); let x = trnd() * s, y = trnd() * s; g.moveTo(x, y); for (let k = 0; k < 6; k++) { x += (trnd() - 0.3) * 60; y += (trnd() - 0.5) * 36; g.lineTo(x, y); } g.stroke(); } };
+  // one tile per floor kind; edge is how many metres one repeat of it covers. The builder's sheet: 5 by 2.5 ft Italian design
+  // tiles in the living room, dining, bedrooms, dress and store; non-skid tiles in the kitchen, toilets and balconies
   const FLOORS = {
-    tile: { tex: makeTex(256, (g, s) => { speckle(g, s, '#e6e0d3', 4000, 0.06, 0.08, 3); grid(g, s, 128, 'rgba(90,80,70,0.35)'); }), edge: 1.2, rough: 0.4 },
+    tile: { tex: makeTex(256, (g, s) => { speckle(g, s, '#ebe6dc', 3000, 0.05, 0.08, 3); vein(g, s); g.fillStyle = 'rgba(90,80,70,0.3)'; g.fillRect(0, 0, s, 2); g.fillRect(0, s / 2, s, 2); g.fillRect(0, 0, 2, s); }), edge: 1.52, rough: 0.3 },
     wood: { tex: makeTex(256, (g, s) => { speckle(g, s, '#b07c4f', 5000, 0.18, 0.08, 1); g.fillStyle = 'rgba(0,0,0,0.12)'; for (let i = 0; i < 400; i++) g.fillRect(trnd() * s, trnd() * s, 2 + trnd() * 40, 1); g.fillStyle = 'rgba(0,0,0,0.3)'; for (let y = 0; y < s; y += 32) { g.fillRect(0, y, s, 2); g.fillRect(((y / 32) % 2) * 128, y, 2, 32); } }), edge: 1.0, rough: 0.6 },
-    kitchen: { tex: makeTex(256, (g, s) => { speckle(g, s, '#9c8c7a', 5000, 0.12, 0.06, 3); grid(g, s, 64, 'rgba(40,30,20,0.35)'); }), edge: 0.6, rough: 0.45 },
-    bath: { tex: makeTex(256, (g, s) => { speckle(g, s, '#a9bcc4', 3000, 0.08, 0.1, 3); grid(g, s, 32, 'rgba(255,255,255,0.5)'); }), edge: 0.6, rough: 0.35 },
+    kitchen: { tex: makeTex(256, (g, s) => { speckle(g, s, '#a79b8c', 6000, 0.12, 0.06, 2); grid(g, s, 64, 'rgba(40,30,20,0.35)'); }), edge: 0.6, rough: 0.8 },
+    bath: { tex: makeTex(256, (g, s) => { speckle(g, s, '#b5b2ab', 6000, 0.1, 0.08, 2); grid(g, s, 64, 'rgba(40,40,40,0.3)'); }), edge: 0.6, rough: 0.8 },
     balcony: { tex: makeTex(256, (g, s) => { speckle(g, s, '#b86f4e', 5000, 0.16, 0.06, 3); grid(g, s, 64, 'rgba(60,30,20,0.4)', 3); }), edge: 0.6, rough: 0.8 },
     plain: { tex: makeTex(256, (g, s) => { speckle(g, s, '#cfc9bd', 4000, 0.08, 0.06, 3); grid(g, s, 128, 'rgba(60,50,40,0.25)'); }), edge: 0.6, rough: 0.6 },
   };
-  const FLOOR_OF = { living: 'tile', dining: 'tile', passage: 'tile', bed: 'wood', kitchen: 'kitchen', toilet: 'bath', balcony: 'balcony', store: 'plain', servant: 'plain', dress: 'wood' };
+  const FLOOR_OF = { living: 'tile', dining: 'tile', passage: 'tile', bed: 'tile', kitchen: 'kitchen', toilet: 'bath', balcony: 'balcony', store: 'tile', servant: 'plain', dress: 'tile' };
+  // glazed 4 by 2 ft wall tiles: up the toilet walls to 8 ft and over the kitchen counter
+  const glazedTex = makeTex(256, (g, s) => { speckle(g, s, '#dfe4e4', 2500, 0.04, 0.1, 3); g.fillStyle = 'rgba(255,255,255,0.6)'; g.fillRect(0, 0, s, 3); g.fillRect(0, s / 2, s, 3); g.fillRect(0, 0, 3, s); }); glazedTex.repeat.set(1, 1);
+  const glazedMat = new THREE.MeshStandardMaterial({ map: glazedTex, roughness: 0.2 });
+  const quartzMat = new THREE.MeshStandardMaterial({ map: makeTex(128, (g, s) => speckle(g, s, '#e9e5dd', 3000, 0.1, 0.1, 1)), roughness: 0.25 });
+  const cabinetMat = new THREE.MeshStandardMaterial({ color: '#6e5a48', roughness: 0.4 });
+  const steelMat = new THREE.MeshStandardMaterial({ color: '#c9ccd0', roughness: 0.25, metalness: 0.9 });
   const shadeWall = (g, s) => { const top = g.createLinearGradient(0, 0, 0, s * 0.18); top.addColorStop(0, 'rgba(30,20,10,0.22)'); top.addColorStop(1, 'rgba(30,20,10,0)'); g.fillStyle = top; g.fillRect(0, 0, s, s * 0.18); const bot = g.createLinearGradient(0, s, 0, s * 0.9); bot.addColorStop(0, 'rgba(30,20,10,0.14)'); bot.addColorStop(1, 'rgba(30,20,10,0)'); g.fillStyle = bot; g.fillRect(0, s * 0.9, s, s * 0.1); };
   const plasterTex = makeTex(256, (g, s) => { speckle(g, s, '#efe9df', 5000, 0.06, 0.05, 3); shadeWall(g, s); }); plasterTex.repeat.set(2, 1); plasterTex.wrapT = THREE.ClampToEdgeWrapping;
   const ACCENT = { living: '#c9b79b', bed: '#a9b8ad', dining: '#c9b79b' };
@@ -138,7 +146,7 @@ function init() {
   const curtainMat = new THREE.MeshStandardMaterial({ color: '#d6cbb8', roughness: 1 });
   const ceilingTex = makeTex(256, (g, s) => speckle(g, s, '#f4f1eb', 4000, 0.04, 0.04, 3)); ceilingTex.repeat.set(6, 6);
   const grassTex = makeTex(256, (g, s) => speckle(g, s, '#6f9a45', 9000, 0.22, 0.1, 2)); grassTex.repeat.set(220, 220);
-  const facadeTex = makeTex(256, (g, s) => { speckle(g, s, '#ece3d2', 3000, 0.06, 0.05, 3); g.fillStyle = '#5c7389'; g.fillRect(64, 70, 128, 110); g.fillStyle = '#4a4440'; g.fillRect(60, 66, 136, 4); g.fillRect(60, 180, 136, 4); g.fillStyle = '#8a4f3b'; g.fillRect(0, 236, s, 20); });
+  const facadeTex = makeTex(256, (g, s) => { speckle(g, s, '#f1eee8', 3000, 0.06, 0.05, 3); g.fillStyle = '#5c7389'; g.fillRect(64, 70, 128, 110); g.fillStyle = '#2f2d2b'; g.fillRect(60, 66, 136, 4); g.fillRect(60, 180, 136, 4); g.fillStyle = '#5c6b7e'; g.fillRect(0, 236, s, 20); });
 
   const roomFloor = (r, kind) => { // the tile laid across the room, darker along the walls
     const w = Math.min(1024, Math.round(r.mw * 96)), h = Math.min(1024, Math.round(r.md * 96));
@@ -151,7 +159,7 @@ function init() {
   };
   const wallMat = new THREE.MeshStandardMaterial({ map: plasterTex, roughness: 0.95 });
   const skirtMat = new THREE.MeshStandardMaterial({ color: '#5a4634', roughness: 0.7 });
-  const doorMat = new THREE.MeshStandardMaterial({ color: '#7a5235', roughness: 0.55 });
+  const doorMat = new THREE.MeshStandardMaterial({ color: '#8c6a4a', roughness: 0.35 }); // laminated flush doors, as the builder's sheet says
   const railMat = new THREE.MeshStandardMaterial({ color: '#4a3f38', roughness: 0.7, metalness: 0.3 });
   const glassMat = new THREE.MeshStandardMaterial({ color: '#bcd3e4', roughness: 0.08, metalness: 0.5, transparent: true, opacity: 0.45, side: THREE.DoubleSide, envMapIntensity: 1.2 });
   const frameMat = new THREE.MeshStandardMaterial({ color: '#5a5a5a', roughness: 0.6 });
@@ -198,6 +206,7 @@ function init() {
     if (near(a.y + a.h, b.y) || near(b.y + b.h, a.y)) { const lo = Math.max(a.x, b.x), hi = Math.min(a.x + a.w, b.x + b.w); if (hi > lo) line('h', near(a.y + a.h, b.y) ? b.y : a.y).opens.push([lo, hi]); }
   });
   const openings = []; // segments you can walk through, in metres: [x1, z1, x2, z2]
+  const windowsAt = []; // [dir, c, from, to] in metres, so the kitchen counter keeps off the window wall
   const accented = new Set();
   const piece = (dir, c, p, qq, y0, y1, mat, thick = WALL_T) => { // a stretch of wall on a line, between heights y0 and y1
     const len = M(qq - p); if (len <= 0.005 || y1 <= y0) return;
@@ -234,6 +243,7 @@ function init() {
         piece(L.dir, L.c, p, ws, 0, WALL_H, wallMat); piece(L.dir, L.c, we, qq, 0, WALL_H, wallMat);
         piece(L.dir, L.c, ws, we, 0, 0.9, wallMat); piece(L.dir, L.c, ws, we, 2.1, WALL_H, wallMat);
         piece(L.dir, L.c, ws, we, 0.9, 2.1, glassMat, 0.02); piece(L.dir, L.c, ws, we, 0.86, 0.94, frameMat, 0.2); piece(L.dir, L.c, ws, we, 2.06, 2.14, frameMat, 0.2);
+        windowsAt.push([L.dir, M(L.c), M(ws), M(we)]);
         const inward = L.dir === 'h' ? Math.sign(room.y + room.h / 2 - L.c) : Math.sign(room.x + room.w / 2 - L.c); // which side of the wall the room is
         for (const at of [ws - 0.2, we + 0.2]) { const cu = new THREE.Mesh(new THREE.BoxGeometry(L.dir === 'h' ? 0.55 : 0.1, 2.35, L.dir === 'h' ? 0.1 : 0.55), curtainMat); cu.position.set(L.dir === 'h' ? M(at) : M(L.c) + inward * 0.15, 1.2, L.dir === 'h' ? M(L.c) + inward * 0.15 : M(at)); cu.castShadow = cu.receiveShadow = true; flatGroup.add(cu); }
         const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, M(we - ws) + 1.0, 8), frameMat); rod.rotation.z = L.dir === 'h' ? Math.PI / 2 : 0; rod.rotation.x = L.dir === 'h' ? 0 : Math.PI / 2; rod.position.set(L.dir === 'h' ? M(mid) : M(L.c) + inward * 0.15, 2.4, L.dir === 'h' ? M(L.c) + inward * 0.15 : M(mid)); flatGroup.add(rod);
@@ -243,6 +253,38 @@ function init() {
       piece(L.dir, L.c, p, qq, 0, WALL_H, wallMat);
     }
   }
+
+  // ---------- the builder's finishes: glazed tiles to 8 ft round the toilets, a counter with its dado in the kitchen ----------
+  const inset = WALL_T / 2 + 0.012;
+  const sidesOf = (r) => { const x0 = r.mx + inset, x1 = r.mx + r.mw - inset, z0 = r.mz + inset, z1 = r.mz + r.md - inset; return [['h', z0, x0, x1, 1], ['h', z1, x0, x1, -1], ['v', x0, z0, z1, 1], ['v', x1, z0, z1, -1]]; };
+  const spansOn = (dir, c, a, b, cuts) => { // the stretch a..b on a wall line, minus the openings (and windows) on it
+    let spans = [[a, b]];
+    for (const [d, cc, u, v] of cuts) {
+      if (d !== dir || Math.abs(cc - c) > 0.2) continue;
+      const lo = Math.min(u, v) - 0.06, hi = Math.max(u, v) + 0.06;
+      spans = spans.flatMap(([s0, s1]) => (hi <= s0 || lo >= s1 ? [[s0, s1]] : [[s0, Math.max(s0, lo)], [Math.min(s1, hi), s1]].filter(([q0, q1]) => q1 - q0 > 0.08)));
+    }
+    return spans;
+  };
+  const cutsOn = openings.map(([x1, z1, x2, z2]) => (Math.abs(z1 - z2) < 0.01 ? ['h', z1, x1, x2] : ['v', x1, z1, z2]));
+  const facing = (dir, inward) => (dir === 'h' ? (inward > 0 ? 0 : Math.PI) : (inward > 0 ? Math.PI / 2 : -Math.PI / 2));
+  const strip = (dir, c, s0, s1, y0, y1, inward, mat) => { const p = new THREE.Mesh(new THREE.PlaneGeometry(s1 - s0, y1 - y0), mat); p.position.set(dir === 'h' ? (s0 + s1) / 2 : c, (y0 + y1) / 2, dir === 'h' ? c : (s0 + s1) / 2); p.rotation.y = facing(dir, inward); p.receiveShadow = true; flatGroup.add(p); return p; };
+  rooms.forEach((r) => {
+    if (r.kind === 'toilet') { for (const [dir, c, a, b, inward] of sidesOf(r)) for (const [s0, s1] of spansOn(dir, c, a, b, cutsOn)) strip(dir, c, s0, s1, 0.11, Math.min(WALL_H - 0.1, 2.44), inward, glazedMat); return; }
+    if (r.kind !== 'kitchen') return;
+    // the counter goes on the longest run of wall with no door and no window; quartz top, laminate cabinets, a steel sink, a tile dado 2.5 ft high above it
+    let best = null;
+    for (const [dir, c, a, b, inward] of sidesOf(r)) for (const [s0, s1] of spansOn(dir, c, a, b, [...cutsOn, ...windowsAt])) if (!best || s1 - s0 > best.len) best = { dir, c, s0, s1, inward, len: s1 - s0 };
+    if (!best || best.len < 1.2) return;
+    const { dir, c, s0, s1, inward, len } = best;
+    const ctr = (depthAt) => (dir === 'h' ? [(s0 + s1) / 2, c + inward * depthAt] : [c + inward * depthAt, (s0 + s1) / 2]);
+    const box = (w, h, d, y, depthAt, mat) => { const m = new THREE.Mesh(new THREE.BoxGeometry(dir === 'h' ? w : d, h, dir === 'h' ? d : w), mat); const [x, z] = ctr(depthAt); m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; flatGroup.add(m); return m; };
+    box(len, 0.82, 0.58, 0.41, 0.3, cabinetMat); box(len + 0.02, 0.04, 0.62, 0.84, 0.31, quartzMat);
+    strip(dir, c, s0, s1, 0.86, 0.86 + 0.76, inward, glazedMat);
+    const sink = new THREE.Mesh(new THREE.BoxGeometry(dir === 'h' ? 0.55 : 0.42, 0.015, dir === 'h' ? 0.42 : 0.55), steelMat); const [sx, sz] = ctr(0.3); const along = s0 + Math.min(len - 0.45, 0.75);
+    sink.position.set(dir === 'h' ? along : sx, 0.868, dir === 'h' ? sz : along); flatGroup.add(sink);
+    const tap = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.28, 8), steelMat); const [tx, tz] = ctr(0.08); tap.position.set(dir === 'h' ? along : tx, 1.0, dir === 'h' ? tz : along); flatGroup.add(tap);
+  });
 
   // ---------- the world outside: the ground far below, the neighbours, the other blocks as masses ----------
   const drop = -(here.floor * FLOOR_H + 1);

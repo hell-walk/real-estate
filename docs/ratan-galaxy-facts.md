@@ -57,7 +57,50 @@ Sample maintenance: ₹2.50 a sq ft a month. Sample payment plan for resale: ₹
 
 Clubhouse with a multipurpose hall, swimming pool and a kids' pool, gymnasium, yoga room, basketball court (half court on the plan), tennis court, badminton court, skating rink, jogging and cycling track, children's play area with a sand pit, senior citizens' sitting area, amphitheatre, landscaped gardens and lawns, gazebo, convenience store, society office, 24-hour power backup and water supply, CCTV and gated security with intercom, fire fighting system, rainwater harvesting, lifts in every block, covered parking.
 
-Home specifications on the listings: vitrified tile flooring, marble in some homes, modular kitchen with granite counter and steel sink, laminated flush doors, aluminium sliding windows, concealed wiring and plumbing, premium sanitary fittings.
+Home specifications on the older listings (Blocks B and C): vitrified tile flooring, marble in some homes, modular kitchen with granite counter and steel sink, laminated flush doors, aluminium sliding windows, concealed wiring and plumbing, premium sanitary fittings.
+
+## The builder's Phase II specification sheet (brochure republished on housing.com, read 2026-11-07)
+
+| Item | As the sheet says |
+| --- | --- |
+| Structure | RCC frame with first class brick work |
+| Flooring | 5' × 2.5' "Modern Italian Design" tiles in the living room, dining room, store room, dress room and all bedrooms; non-skid tiles in the kitchen, toilets and balconies |
+| Kitchen | Quartz counter top, 8' × 2.5' tile dado above the counter, stainless steel sink |
+| Toilets | 4' × 2' glazed tiles up to 8 ft, Grohe plumbing fittings, American Standard ceramic ware |
+| Windows | UPVC |
+| Chaukhat | Moulded 8 ft WPC frames |
+| Doors | Both-side laminated flush doors |
+| Security | CCTV and EPABX intercom between the flats and the main gate |
+| Electrical | Insulated copper wiring in concealed conduit, branded modular switches |
+| Lifts | Two ten-passenger auto-door lifts a block (Kone, Otis, Schindler, Thyssen Krupp or equivalent) |
+| Generator | 1 KVA backup a flat, 24 hours; full backup for lifts, common lights and pumps |
+| Parking | Covered and open |
+| Water | Round the clock from the overhead tank |
+| Internal finish | Uno putty on every internal wall |
+| External finish | Apex finish |
+| Fire | Fire fighting system |
+
+The site's 3D flat follows this sheet: tile in every bedroom (not wood), tiled toilet walls to 8 ft, a counter with a dado and a sink in the kitchen, laminated flush doors.
+
+## How the built towers look (photographs on 99acres and housing.com, read 2026-11-07, reference only, not copied)
+
+White plaster towers with slate-blue painted bands: the balcony slabs and fascias, a vertical band up the tip of every wing and the lift core band are blue-grey; railings are black mild steel with horizontal bars; window frames dark; split air-conditioner units under many windows. The main gate is a white classical frame with a moulded cornice and the name on a dark board over it; a black sliding gate; a red "VISITOR PARKING" board on the wall beside it; palms inside. The hero model's colours were changed to match on 2026-11-07.
+
+## The Phase II brochure's floor plans (Block A)
+
+The brochure for Phase II (RERA UPRERAPRJ718664, "Phase 1 delivered, 150 families living") gives a different flat mix from the Phase I plans this site was built on. Per floor of the X-shaped block:
+
+| Flats | Type | Super area |
+| --- | --- | --- |
+| 1 and 8 | 4 BHK + study + store | 2,535 sq ft |
+| 2, 7, 9 and 14 | 3 BHK + study + store | 1,905 sq ft |
+| 3 and 6 | 3 BHK + study + store | 1,917 sq ft |
+| 10 and 13 | 3 BHK | 1,781 sq ft |
+| 4, 5, 11 and 12 | 2 BHK + store | 1,294 sq ft |
+
+Room sizes on those plans: 2 BHK drawing room 18'5" × 11'6", dining 10' × 10'6", bedrooms 14' × 11' and 14' × 11', kitchen 10' × 7'; 3 BHK 1,781 drawing room 17' × 10'6", bedrooms 17'4" × 11', 13' × 11', 11' × 13'; 4 BHK drawing room 17'6" × 11'6", dining 11'6" × 13'4", bedrooms 12' × 14'6", 12' × 14', 12' × 14', 11' × 13', study 10' × 8', kitchen 10' × 8'. The site still uses the Phase I plans and numbering for every block; moving Block A to these plans is a follow-up (`src/js/plans.js`, the block pages, the price sheet).
+
+Prices on the portals in 2025 (asking, not samples): 2 BHK 994 to 1,294 sq ft ₹68.6 L to ₹99 L; 3 BHK 1,769 to 1,917 sq ft ₹1.22 Cr to ₹1.47 Cr; 4 BHK 1,894 to 2,535 sq ft ₹1.45 Cr to ₹1.97 Cr; registry average about ₹7,900 a sq ft, listing average ₹10,300 to ₹13,000 a sq ft. Phase II RERA on 99acres is also given as UPRERAPRJ9814 (December 2019). Project videos: youtube.com/watch?v=zlzMOhyQHTQ and 4j_QGdKkdgo. The brochure's amenity list adds a welcome fountain, a baby pool, a jacuzzi, a banquet hall, a yoga hall and an indoor games room (snooker, table tennis, air hockey, foosball).
 
 ## Around it (distances from the listings, approximate)
 
@@ -78,4 +121,5 @@ The sales lounge, its hours (Monday to Saturday 10:00 to 19:00, Sunday 11:00 to 
 
 - UP RERA entries as republished at aurumproptech.in: UPRERAPRJ8949 (Phase I), UPRERAPRJ718664 (Phase II)
 - Master plan and floor plan images: squareyards.com project 8865, houssed.com project 4758
+- 99acres project r52338, housing.com project pid-3826 (brochure, photographs, prices); magicbricks could not be opened from here
 - Listings: 99acres, regrob, houssed, squareyards, housing.com, proptiger (2024 to 2025)
