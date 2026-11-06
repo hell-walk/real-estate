@@ -42,11 +42,11 @@ export const CATALOGUE = [
   { id: 'bookshelf', room: 'Living', name: 'Bookshelf', w: 0.9, d: 0.35, h: 1.8, models: [m('wooden_display_shelves_01')] },
   { id: 'dining-6', room: 'Dining', name: 'Dining table, six', w: 2.4, d: 2.0, h: 0.9, models: [m('wooden_table_02'), ...chairsRound(6, 0.6, 0.75)] },
   { id: 'dining-4', room: 'Dining', name: 'Dining table, four', w: 1.6, d: 1.8, h: 0.9, models: [m('painted_wooden_table'), ...chairsRound(4, 0.35, 0.7)] },
-  { id: 'bed-double', room: 'Bedroom', name: 'Double bed', w: 1.8, d: 2.1, h: 1.2, models: [m('GothicBed_01')] },
+  { id: 'bed-double', room: 'Bedroom', name: 'Double bed', w: 1.9, d: 2.15, h: 1.05, parts: [box(0, 0.15, 0.05, 1.8, 0.3, 2.05, '#4a3b30'), box(0, 0.38, 0.1, 1.7, 0.16, 1.95, '#f1ede6'), box(0, 0.49, 0.38, 1.72, 0.07, 1.3, '#d9d4cc'), box(-0.42, 0.52, -0.72, 0.6, 0.12, 0.4, '#faf8f4'), box(0.42, 0.52, -0.72, 0.6, 0.12, 0.4, '#faf8f4'), box(0, 0.52, -1.03, 1.9, 1.05, 0.09, '#8a8f93')] },
   { id: 'bed-single', room: 'Bedroom', name: 'Single bed', w: 0.95, d: 2.0, h: 0.95, parts: [box(0, 0.22, 0, 0.95, 0.44, 2.0, '#8b6b4a'), box(0, 0.54, 0.05, 0.9, 0.2, 1.9, '#e9e3d6'), box(0, 0.7, -0.7, 0.55, 0.12, 0.4, '#f4f1ea'), box(0, 0.5, -0.98, 0.95, 1.0, 0.06, '#6d5138')] },
-  { id: 'wardrobe', room: 'Bedroom', name: 'Wardrobe', w: 1.4, d: 0.6, h: 2.0, models: [m('painted_wooden_cabinet')] },
-  { id: 'nightstand', room: 'Bedroom', name: 'Nightstand', w: 0.5, d: 0.4, h: 0.6, models: [m('ClassicNightstand_01')] },
-  { id: 'desk', room: 'Bedroom', name: 'Desk and chair', w: 1.2, d: 1.3, h: 0.78, models: [m('painted_wooden_table', 0, -0.25), m('dining_chair_02', 0, 0.45, 0)] },
+  { id: 'wardrobe', room: 'Bedroom', name: 'Wardrobe', w: 1.4, d: 0.6, h: 2.1, parts: [box(0, 0.04, 0, 1.36, 0.08, 0.56, '#3a342e'), box(0, 1.09, 0, 1.4, 2.02, 0.6, '#e8e4dc'), box(0, 1.09, 0.301, 0.012, 1.98, 0.004, '#9a948a'), box(-0.07, 1.0, 0.31, 0.02, 0.5, 0.02, '#2b2b2b'), box(0.07, 1.0, 0.31, 0.02, 0.5, 0.02, '#2b2b2b')] },
+  { id: 'nightstand', room: 'Bedroom', name: 'Nightstand', w: 0.5, d: 0.4, h: 0.55, parts: [box(0, 0.3, 0, 0.5, 0.5, 0.4, '#e8e4dc'), box(0, 0.05, 0, 0.44, 0.1, 0.34, '#3a342e'), box(0, 0.42, 0.201, 0.46, 0.004, 0.004, '#9a948a'), box(0, 0.31, 0.21, 0.16, 0.02, 0.02, '#2b2b2b')] },
+  { id: 'desk', room: 'Bedroom', name: 'Desk and chair', w: 1.2, d: 1.3, h: 0.76, models: [m('dining_chair_02', 0, 0.45, 0)], fixed: [box(0, 0.74, -0.25, 1.2, 0.04, 0.6, '#d9cdb8'), box(-0.56, 0.36, -0.52, 0.04, 0.72, 0.04, '#2b2b2b'), box(0.56, 0.36, -0.52, 0.04, 0.72, 0.04, '#2b2b2b'), box(-0.56, 0.36, 0.02, 0.04, 0.72, 0.04, '#2b2b2b'), box(0.56, 0.36, 0.02, 0.04, 0.72, 0.04, '#2b2b2b')] },
   { id: 'fridge', room: 'Kitchen', name: 'Fridge', w: 0.7, d: 0.7, h: 1.75, parts: [box(0, 0.875, 0, 0.7, 1.75, 0.7, '#d8d8d8'), box(0.25, 1.1, 0.36, 0.04, 0.5, 0.02, '#8a8a8a'), box(0, 1.2, 0.355, 0.68, 0.01, 0.01, '#9a9a9a')] },
   { id: 'washing', room: 'Kitchen', name: 'Washing machine', w: 0.6, d: 0.6, h: 0.85, parts: [box(0, 0.425, 0, 0.6, 0.85, 0.6, '#e8e8e8'), box(0, 0.42, 0.3, 0.4, 0.4, 0.02, '#333a44')] },
   { id: 'plant', room: 'Anywhere', name: 'Plant', w: 0.5, d: 0.5, h: 1.0, models: [m('potted_plant_02')] },
@@ -158,8 +158,8 @@ function init() {
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = aniso; return t;
   };
   const wallMat = new THREE.MeshStandardMaterial({ map: plasterTex, roughness: 0.95 });
-  const skirtMat = new THREE.MeshStandardMaterial({ color: '#5a4634', roughness: 0.7 });
-  const doorMat = new THREE.MeshStandardMaterial({ color: '#8c6a4a', roughness: 0.35 }); // laminated flush doors, as the builder's sheet says
+  const skirtMat = new THREE.MeshStandardMaterial({ color: '#c6bfb3', roughness: 0.5 }); // a tile skirting, as the floors
+  const doorMat = new THREE.MeshStandardMaterial({ color: '#c9b89f', roughness: 0.45 }); // laminated flush doors, as the builder's sheet says, in a light oak
   const railMat = new THREE.MeshStandardMaterial({ color: '#4a3f38', roughness: 0.7, metalness: 0.3 });
   const glassMat = new THREE.MeshStandardMaterial({ color: '#bcd3e4', roughness: 0.08, metalness: 0.5, transparent: true, opacity: 0.45, side: THREE.DoubleSide, envMapIntensity: 1.2 });
   const frameMat = new THREE.MeshStandardMaterial({ color: '#5a5a5a', roughness: 0.6 });
@@ -180,7 +180,7 @@ function init() {
     const lx = cx + (sits ? Math.min(0.9, r.mw * 0.3) : 0);
     if (r.kind === 'dining') loadModel('modern_ceiling_lamp_01').then((proto) => { const mm = proto.clone(); const b = proto.userData.box, cc = b.getCenter(new THREE.Vector3()); mm.position.set(cx - cc.x, WALL_H - b.max.y, cz - cc.z); flatGroup.add(mm); }).catch(() => {});
     else { const lamp = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.18, 0.05, 20), lampMat); lamp.position.set(lx, WALL_H - 0.03, cz); flatGroup.add(lamp); }
-    const glow = new THREE.PointLight('#ffe3bf', r.kind === 'toilet' || r.kind === 'store' ? 4 : 9, Math.max(r.mw, r.md) + 3, 2); glow.position.set(lx, WALL_H - 0.5, cz); flatGroup.add(glow);
+    const glow = new THREE.PointLight('#fff3e2', r.kind === 'toilet' || r.kind === 'store' ? 4 : 9, Math.max(r.mw, r.md) + 3, 2); glow.position.set(lx, WALL_H - 0.5, cz); flatGroup.add(glow);
     if (!sits) return;
     const fan = new THREE.Group(); fan.position.set(cx, WALL_H - 0.35, cz);
     const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.35, 6), fanMat); rod.position.y = 0.175; fan.add(rod);
