@@ -50,14 +50,26 @@ function floorLayout(shape) {
   return flats;
 }
 
-function init() {
-  if (!webglAvailable()) return;
+const loader = (() => { // the loading card on the hero: a step name and a percentage, then it goes
+  const el = document.querySelector('[data-loader]'); if (!el) return { set() {}, done() {} };
+  const step = el.querySelector('[data-step]'), bar = el.querySelector('[data-bar]'), pct = el.querySelector('[data-pct]');
+  return {
+    set(p, text) { if (bar) bar.style.width = `${p}%`; if (pct) pct.textContent = String(p); if (text && step) step.textContent = text; },
+    done() { this.set(100, 'Pinned'); el.classList.add('is-done'); setTimeout(() => { el.hidden = true; }, 600); },
+  };
+})();
+const frame = () => new Promise((r) => requestAnimationFrame(r));
+
+async function init() {
+  if (!webglAvailable()) { loader.done(); return; }
+  loader.set(18, 'Mixing the plaster and the paint');
+  await frame();
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const coarse = matchMedia('(pointer: coarse)').matches;
   const phone = coarse || innerWidth < 768;
 
   let renderer;
-  try { renderer = new THREE.WebGLRenderer({ antialias: !phone, powerPreference: 'high-performance', alpha: false }); } catch { return; }
+  try { renderer = new THREE.WebGLRenderer({ antialias: !phone, powerPreference: 'high-performance', alpha: false }); } catch { loader.done(); return; }
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, phone ? 1.25 : 1.5));
   renderer.shadowMap.enabled = !phone;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -109,6 +121,7 @@ function init() {
   })();
   const plinthTex = makeTex(256, (g, s) => { speckle(g, s, '#8f877e', 4000, 0.14, 0.05, 3); g.fillStyle = 'rgba(0,0,0,0.12)'; for (let i = 0; i <= s; i += 32) g.fillRect(i, 0, 1, s); }, [20, 1]);
 
+  loader.set(34, 'Laying the ground and the roads'); await frame();
   // ---------- the ground: flat Lucknow country, the plot paved inside its wall ----------
   const ground = new THREE.Mesh(new THREE.PlaneGeometry(1600, 1600), new THREE.MeshStandardMaterial({ map: grassTex, roughness: 1 }));
   ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
@@ -213,6 +226,7 @@ function init() {
   lampSpots.forEach(([x, z], i) => { dummy.position.set(x, 3, z); dummy.rotation.set(0, 0, 0); dummy.scale.set(1, 1, 1); dummy.updateMatrix(); posts.setMatrixAt(i, dummy.matrix); dummy.position.set(x, 6.1, z); dummy.updateMatrix(); heads.setMatrixAt(i, dummy.matrix); });
   posts.castShadow = shadows; scene.add(posts, heads);
 
+  loader.set(52, 'Raising the three blocks'); await frame();
   // ---------- the three blocks ----------
   const facadeMat = new THREE.MeshStandardMaterial({ map: plasterTex, roughness: 0.92 });
   const slabMat = new THREE.MeshStandardMaterial({ color: '#e8e5de', roughness: 0.9 }); // the slab lines and the parapet are white plaster
@@ -290,6 +304,7 @@ function init() {
   const acs = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), acMat, acMatrices.length);
   acMatrices.forEach((m, i) => acs.setMatrixAt(i, m)); scene.add(acs);
 
+  loader.set(72, 'Planting the palms and the trees'); await frame();
   // ---------- trees: palms along the parking row, round trees in the lawns and the garden, more outside ----------
   const trunkMat = new THREE.MeshStandardMaterial({ color: '#5a4634', roughness: 1 });
   const palms = 24;
@@ -367,6 +382,7 @@ function init() {
     scene.add(g);
   });
 
+  loader.set(88, 'Waiting for the afternoon light'); await frame();
   // ---------- light ----------
   const sun = new THREE.DirectionalLight('#ffd9a6', 3);
   sun.castShadow = shadows; sun.shadow.mapSize.set(phone ? 1024 : 4096, phone ? 1024 : 4096);
@@ -609,7 +625,7 @@ function init() {
     if (timeInput && manualLight === null) timeInput.value = String(Math.round(u * 100));
     if (pickDirty) { pickDirty = false; pickAt(); }
     renderer.render(scene, camera);
-    if (!started) { started = true; hero.classList.add('is-3d'); if (ui) ui.hidden = false; }
+    if (!started) { started = true; hero.classList.add('is-3d'); if (ui) ui.hidden = false; loader.done(); }
   };
   const loop = () => { raf = 0; if (!visible || document.hidden) return; render(); raf = requestAnimationFrame(loop); };
   const start = () => { if (!raf && visible && !document.hidden && (!reduced || mode !== 'approach')) raf = requestAnimationFrame(loop); };

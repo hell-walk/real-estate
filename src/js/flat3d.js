@@ -14,6 +14,16 @@ const stage = document.getElementById('flat-stage');
 const panel = document.getElementById('flat-panel');
 
 const WALL_H = 2.9, WALL_T = 0.15, DOOR_H = 2.1, FLOOR_H = 3.1;
+
+const loader = (() => { // the loading card over the picture
+  const el = document.querySelector('[data-loader]'); if (!el) return { set() {}, done() {} };
+  const step = el.querySelector('[data-step]'), bar = el.querySelector('[data-bar]'), pct = el.querySelector('[data-pct]');
+  let finished = false;
+  return {
+    set(p, text) { if (finished) return; if (bar) bar.style.width = `${p}%`; if (pct) pct.textContent = String(p); if (text && step) step.textContent = text; },
+    done() { if (finished) return; finished = true; this.set(100, 'Done'); el.classList.add('is-done'); setTimeout(() => { el.hidden = true; }, 600); },
+  };
+})();
 const WINDOWED = new Set(['living', 'dining', 'bed', 'kitchen', 'servant', 'dress']);
 
 // ---------- the catalogue ----------
@@ -78,7 +88,7 @@ function init() {
   if (pickForm) { pickForm.elements.block.value = here.block; pickForm.elements.floor.value = here.floor; pickForm.elements.flat.value = here.flat; }
 
   let renderer;
-  try { renderer = new THREE.WebGLRenderer({ antialias: !coarse, powerPreference: 'high-performance' }); } catch { stage.classList.add('no-3d'); return; }
+  try { renderer = new THREE.WebGLRenderer({ antialias: !coarse, powerPreference: 'high-performance' }); } catch { stage.classList.add('no-3d'); loader.done(); return; }
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, coarse ? 1.25 : 1.75));
   renderer.shadowMap.enabled = !coarse; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
@@ -374,7 +384,10 @@ function init() {
     g.position.set(item.x, 0, item.z); g.rotation.y = (item.rot || 0) * Math.PI / 2;
     pieces.add(g); return g;
   };
+  loader.set(70, layout.length ? `Bringing in ${layout.length} piece${layout.length === 1 ? '' : 's'} of furniture` : 'Opening the doors');
   layout.forEach(buildPiece);
+  Promise.allSettled(layout.map((it) => { const cat = CATALOGUE.find((c) => c.id === it.kind); return cat?.models ? Promise.all(cat.models.map((spec) => loadModel(spec.id))) : null; })).then(() => loader.done());
+  setTimeout(() => loader.done(), 12000);
 
   let selected = null, dragging = null, dragOff = new THREE.Vector3();
   const selectedBox = q('[data-selected]');

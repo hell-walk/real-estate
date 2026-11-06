@@ -3,6 +3,9 @@
 (() => {
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+  // ----- the loading card: if the 3D script never arrives, let it go after a while -----
+  document.querySelectorAll('[data-loader]').forEach((el) => setTimeout(() => { if (!el.classList.contains('is-done')) { el.classList.add('is-done'); setTimeout(() => { el.hidden = true; }, 600); } }, 20000));
+
   // ----- menu panel -----
   const toggle = document.querySelector('.menu-toggle');
   const panel = document.getElementById('menu');
@@ -31,6 +34,9 @@
       // scroll, or a capture that resizes the viewport, can outrun the observer).
       const sweep = () => targets.forEach((el) => { if (el.classList.contains('is-in')) return; const r = el.getBoundingClientRect(); if (r.top < innerHeight * 0.95) { el.classList.add('is-in'); io.unobserve(el); } });
       window.addEventListener('load', () => setTimeout(sweep, 2500));
+      window.addEventListener('resize', sweep);
+      // After a while nothing stays hidden, whatever the observer saw: the entrance is a garnish, never a gate.
+      setTimeout(() => targets.forEach((el) => { el.classList.add('is-in'); io.unobserve(el); }), 5000);
       let sweepQueued = false;
       window.addEventListener('scroll', () => { if (sweepQueued) return; sweepQueued = true; requestAnimationFrame(() => { sweepQueued = false; sweep(); }); }, { passive: true });
     }
