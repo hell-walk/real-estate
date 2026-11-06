@@ -542,10 +542,28 @@ ul.slips { position: absolute; left: 0; right: 0; bottom: 0; display: flex; alig
 
 /* ---------- the hero's controls: the tour and the flat picker, on the scene ---------- */
 .hero-ui { position: absolute; left: var(--margin); top: 6.5rem; z-index: 3; display: flex; flex-direction: column; align-items: flex-start; gap: 0.75rem; }
-.hero-ui[hidden] { display: none; }
+.hero-ui[hidden], .hero-ui .button[hidden] { display: none; }
 .hero-ui-buttons { display: flex; gap: 0.75rem; flex-wrap: wrap; }
 .hero-caption { max-width: 34ch; font-size: var(--step-small); line-height: 1.45; color: var(--ink); padding: 0.5rem 0.75rem; background: rgba(12, 10, 8, 0.55); min-height: 2.4rem; }
 .hero-caption:empty { display: none; }
+.hero-tools { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; font-size: var(--step-small); }
+.hero-time { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0.75rem; background: rgba(12, 10, 8, 0.55); }
+.hero-time input { width: 120px; accent-color: var(--accent); }
+.hero-filters { display: inline-flex; background: rgba(12, 10, 8, 0.55); }
+.hero-filters button { padding: 0.45rem 0.8rem; min-height: 40px; color: var(--ink); transition: background-color var(--t-hover) var(--ease-out), color var(--t-hover) var(--ease-out); }
+.hero-filters button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.hero-dpad { display: grid; grid-template-columns: repeat(3, 52px); grid-template-rows: repeat(2, 52px); gap: 6px; margin-top: 0.5rem; }
+.hero-dpad[hidden] { display: none; }
+.hero-dpad button { background: rgba(12, 10, 8, 0.7); color: var(--ink); font-size: 1.4rem; min-width: 52px; min-height: 52px; touch-action: none; user-select: none; -webkit-user-select: none; }
+.hero-dpad button[data-key="w"] { grid-column: 2; grid-row: 1; }
+.hero-dpad button[data-key="a"] { grid-column: 1; grid-row: 2; }
+.hero-dpad button[data-key="s"] { grid-column: 2; grid-row: 2; }
+.hero-dpad button[data-key="d"] { grid-column: 3; grid-row: 2; }
+.hero-tip { position: absolute; left: 0; top: 0; pointer-events: none; white-space: nowrap; font-size: var(--step-small); padding: 0.3rem 0.6rem; background: var(--paper); color: var(--paper-ink); z-index: 5; }
+.hero-tip[hidden] { display: none; }
+.hero-ui { pointer-events: none; }
+.hero-ui > * { pointer-events: auto; }
+.hero-ui .hero-tip { pointer-events: none; }
 .hero-pick { position: absolute; right: var(--margin); top: 6.5rem; z-index: 4; width: min(360px, calc(100% - 2 * var(--margin))); background: var(--paper); color: var(--paper-ink); padding: 1.5rem; }
 .hero-pick[hidden] { display: none; }
 .hero-pick h2 { font-size: var(--step-lead); line-height: 1.2; }
@@ -559,6 +577,7 @@ ul.slips { position: absolute; left: 0; right: 0; bottom: 0; display: flex; alig
 .hero-stage canvas.is-over { cursor: pointer; }
 @media (max-width: 48em) {
   .hero-ui { top: 5.5rem; }
+  .hero-time { display: none; }
   .hero-caption { max-width: none; }
   .hero-pick { top: auto; bottom: 0; right: 0; left: 0; width: auto; max-height: 70svh; overflow: auto; }
 }

@@ -1,4 +1,4 @@
-<!-- page {"title": "Ratan Galaxy, Vrindavan Yojna, Lucknow · a sample site", "description": "Ratan Galaxy: 378 two, three and four bedroom homes in three blocks on 4.16 acres in Sector 12, Vrindavan Yojna, off Shaheed Path, Lucknow. Walk the society in 3D, open any flat, book a site visit. An unofficial sample site.", "nav": "home", "path": "/index.html", "bodyClass": "home", "head": "<script type=\"importmap\">{\"imports\":{\"three\":\"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js\"}}</script>", "scripts": "<script type=\"module\" src=\"./js/hero3d.js\"></script>"} -->
+<!-- page {"title": "Ratan Galaxy, Vrindavan Yojna, Lucknow · a sample site", "description": "Ratan Galaxy: 378 two, three and four bedroom homes in three blocks on 4.16 acres in Sector 12, Vrindavan Yojna, off Shaheed Path, Lucknow. Walk the society in 3D, open any flat, book a site visit. An unofficial sample site.", "nav": "home", "path": "/index.html", "bodyClass": "home", "head": "<script type=\"importmap\">{\"imports\":{\"three\":\"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js\",\"three/addons/\":\"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/\"}}</script>", "scripts": "<script type=\"module\" src=\"./js/hero3d.js\"></script>"} -->
 <section class="hero" id="top" aria-labelledby="hero-title">
   <div class="hero-stage" id="hero-stage" aria-hidden="true">
     <img src="./assets/hero-fallback.jpg" alt="" width="1600" height="900" fetchpriority="high">
@@ -6,9 +6,21 @@
   <div class="hero-ui" id="hero-ui" hidden>
     <div class="hero-ui-buttons">
       <button type="button" class="button" data-tour>Take the tour</button>
+      <button type="button" class="button ghost" data-walk>Walk the grounds</button>
       <button type="button" class="button ghost" data-pick>Find a flat</button>
+      <button type="button" class="button ghost" data-reset hidden>Reset the view</button>
+    </div>
+    <div class="hero-tools">
+      <label class="hero-time"><span>Time of day</span><input type="range" min="0" max="100" value="15" data-time aria-label="Time of day, afternoon to dusk"></label>
+      <div class="hero-filters" role="group" aria-label="Show homes">
+        <button type="button" data-filter="all" aria-pressed="true">All</button><button type="button" data-filter="2" aria-pressed="false">2 BHK</button><button type="button" data-filter="3" aria-pressed="false">3 BHK</button><button type="button" data-filter="4" aria-pressed="false">4 BHK</button>
+      </div>
     </div>
     <p class="hero-caption" data-caption hidden></p>
+    <div class="hero-dpad" data-dpad hidden aria-label="Walk">
+      <button type="button" data-key="w" aria-label="Forward">↑</button><button type="button" data-key="a" aria-label="Left">←</button><button type="button" data-key="s" aria-label="Back">↓</button><button type="button" data-key="d" aria-label="Right">→</button>
+    </div>
+    <span class="hero-tip" data-tip hidden></span>
   </div>
   <div class="hero-pick" id="hero-pick" hidden>
     <button type="button" class="pick-close" data-close>Close</button>
@@ -28,7 +40,7 @@
   <div class="hero-foot">
     <h1 class="hero-title" id="hero-title">Ratan Galaxy,<br>Vrindavan Yojna</h1>
     <div class="hero-side">
-      <p>378 two, three and four bedroom homes in three blocks on 4.16 acres in Sector 12, off Shaheed Path, Lucknow. Ready to move. Walk the society above, then open any flat in 3D.</p>
+      <p>378 two, three and four bedroom homes in three blocks on 4.16 acres in Sector 12, off Shaheed Path, Lucknow. Ready to move. Drag the picture to look round, walk in at the gate, click any home to open it in 3D.</p>
       <a class="button" href="./book-a-visit.html">Book a site visit</a>
     </div>
   </div>

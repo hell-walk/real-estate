@@ -1,17 +1,18 @@
 // One flat of Ratan Galaxy in three dimensions. The rooms come from plans.js as rectangles; this file raises the walls
 // between them with their doors and windows, lays the floors, rails the balconies, and puts the flat at its real height
-// over a plain Lucknow ground. You can walk through it at eye level (drag to look, keys or the pad to move, doors
+// over the Lucknow ground. Floors, walls and the facade below are drawn on canvases; reflections come from a room
+// environment; every room has its light and the rooms people sit in a ceiling fan. You can walk through it at eye level (drag to look, keys or the pad to move, doors
 // only) or look down on the plan, and in either view furnish it: pieces from a catalogue, or your own things scanned
 // from a photograph through /api/scan, each dragged into place, turned, and kept in this browser for the next visit.
 // Three.js 0.170.0 from the CDN; nothing here is needed to read the page.
 import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { PLANS, FT, flatFromParams, flatTitle, BLOCKS, ordinal } from './plans.js';
 
 const stage = document.getElementById('flat-stage');
 const panel = document.getElementById('flat-panel');
 
 const WALL_H = 2.9, WALL_T = 0.15, DOOR_H = 2.1, FLOOR_H = 3.1;
-const FLOOR_COLOURS = { living: '#d9d4c9', dining: '#d9d4c9', bed: '#b98b5e', kitchen: '#9c8c7a', toilet: '#9fb3bd', store: '#8c7b68', balcony: '#a8a39b', passage: '#cfc9bd', servant: '#c2a98a', dress: '#c9b69a' };
 const WINDOWED = new Set(['living', 'dining', 'bed', 'kitchen', 'servant', 'dress']);
 
 // ---------- the catalogue: each piece is a few boxes around its footprint centre, x to the right, z to the front ----------
@@ -71,6 +72,7 @@ function init() {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#dfe6ec');
   scene.fog = new THREE.Fog('#dfe6ec', 60, 400);
+  const pmrem = new THREE.PMREMGenerator(renderer); scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture; scene.environmentIntensity = 0.5; pmrem.dispose();
   const walkCam = new THREE.PerspectiveCamera(68, 1, 0.05, 600);
   const planCam = new THREE.OrthographicCamera(-10, 10, 10, -10, 0.1, 200);
   planCam.up.set(0, 0, -1);
@@ -83,16 +85,57 @@ function init() {
   const bounds = rooms.reduce((b, r) => ({ x0: Math.min(b.x0, r.mx), z0: Math.min(b.z0, r.mz), x1: Math.max(b.x1, r.mx + r.mw), z1: Math.max(b.z1, r.mz + r.md) }), { x0: 1e9, z0: 1e9, x1: -1e9, z1: -1e9 });
   const centre = new THREE.Vector3((bounds.x0 + bounds.x1) / 2, 0, (bounds.z0 + bounds.z1) / 2);
   const flatGroup = new THREE.Group(); scene.add(flatGroup);
-  const wallMat = new THREE.MeshStandardMaterial({ color: '#efe9df', roughness: 0.95 });
+
+  // ---------- materials drawn on canvases: tiles, planks, plaster, the facade ----------
+  const aniso = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+  let tseed = 29; const trnd = () => { tseed = (tseed * 16807) % 2147483647; return tseed / 2147483647; };
+  const makeTex = (size, draw) => { const c = document.createElement('canvas'); c.width = c.height = size; const g = c.getContext('2d'); draw(g, size); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = aniso; return t; };
+  const speckle = (g, size, base, n, dark = 0.08, light = 0.06, w = 2) => { g.fillStyle = base; g.fillRect(0, 0, size, size); for (let i = 0; i < n; i++) { g.fillStyle = trnd() < 0.5 ? `rgba(0,0,0,${(trnd() * dark).toFixed(3)})` : `rgba(255,255,255,${(trnd() * light).toFixed(3)})`; g.fillRect(trnd() * size, trnd() * size, 1 + trnd() * w, 1 + trnd() * w); } };
+  const grid = (g, size, step, line, w = 2) => { g.fillStyle = line; for (let i = 0; i <= size; i += step) { g.fillRect(i - w / 2, 0, w, size); g.fillRect(0, i - w / 2, size, w); } };
+  // one tile per floor kind; edge is how many metres one repeat of it covers
+  const FLOORS = {
+    tile: { tex: makeTex(256, (g, s) => { speckle(g, s, '#e6e0d3', 4000, 0.06, 0.08, 3); grid(g, s, 128, 'rgba(90,80,70,0.35)'); }), edge: 1.2, rough: 0.4 },
+    wood: { tex: makeTex(256, (g, s) => { speckle(g, s, '#b07c4f', 5000, 0.18, 0.08, 1); g.fillStyle = 'rgba(0,0,0,0.12)'; for (let i = 0; i < 400; i++) g.fillRect(trnd() * s, trnd() * s, 2 + trnd() * 40, 1); g.fillStyle = 'rgba(0,0,0,0.3)'; for (let y = 0; y < s; y += 32) { g.fillRect(0, y, s, 2); g.fillRect(((y / 32) % 2) * 128, y, 2, 32); } }), edge: 1.0, rough: 0.6 },
+    kitchen: { tex: makeTex(256, (g, s) => { speckle(g, s, '#9c8c7a', 5000, 0.12, 0.06, 3); grid(g, s, 64, 'rgba(40,30,20,0.35)'); }), edge: 0.6, rough: 0.45 },
+    bath: { tex: makeTex(256, (g, s) => { speckle(g, s, '#a9bcc4', 3000, 0.08, 0.1, 3); grid(g, s, 32, 'rgba(255,255,255,0.5)'); }), edge: 0.6, rough: 0.35 },
+    balcony: { tex: makeTex(256, (g, s) => { speckle(g, s, '#b86f4e', 5000, 0.16, 0.06, 3); grid(g, s, 64, 'rgba(60,30,20,0.4)', 3); }), edge: 0.6, rough: 0.8 },
+    plain: { tex: makeTex(256, (g, s) => { speckle(g, s, '#cfc9bd', 4000, 0.08, 0.06, 3); grid(g, s, 128, 'rgba(60,50,40,0.25)'); }), edge: 0.6, rough: 0.6 },
+  };
+  const FLOOR_OF = { living: 'tile', dining: 'tile', passage: 'tile', bed: 'wood', kitchen: 'kitchen', toilet: 'bath', balcony: 'balcony', store: 'plain', servant: 'plain', dress: 'wood' };
+  const plasterTex = makeTex(256, (g, s) => speckle(g, s, '#efe9df', 5000, 0.06, 0.05, 3)); plasterTex.repeat.set(2, 1);
+  const ceilingTex = makeTex(256, (g, s) => speckle(g, s, '#f4f1eb', 4000, 0.04, 0.04, 3)); ceilingTex.repeat.set(6, 6);
+  const grassTex = makeTex(256, (g, s) => speckle(g, s, '#6f9a45', 9000, 0.22, 0.1, 2)); grassTex.repeat.set(220, 220);
+  const facadeTex = makeTex(256, (g, s) => { speckle(g, s, '#ece3d2', 3000, 0.06, 0.05, 3); g.fillStyle = '#5c7389'; g.fillRect(64, 70, 128, 110); g.fillStyle = '#4a4440'; g.fillRect(60, 66, 136, 4); g.fillRect(60, 180, 136, 4); g.fillStyle = '#8a4f3b'; g.fillRect(0, 236, s, 20); });
+
+  const wallMat = new THREE.MeshStandardMaterial({ map: plasterTex, roughness: 0.95 });
+  const skirtMat = new THREE.MeshStandardMaterial({ color: '#5a4634', roughness: 0.7 });
+  const doorMat = new THREE.MeshStandardMaterial({ color: '#7a5235', roughness: 0.55 });
   const railMat = new THREE.MeshStandardMaterial({ color: '#4a3f38', roughness: 0.7, metalness: 0.3 });
-  const glassMat = new THREE.MeshStandardMaterial({ color: '#bcd3e4', roughness: 0.15, metalness: 0.3, transparent: true, opacity: 0.55, side: THREE.DoubleSide });
+  const glassMat = new THREE.MeshStandardMaterial({ color: '#bcd3e4', roughness: 0.08, metalness: 0.5, transparent: true, opacity: 0.45, side: THREE.DoubleSide, envMapIntensity: 1.2 });
   const frameMat = new THREE.MeshStandardMaterial({ color: '#5a5a5a', roughness: 0.6 });
   rooms.forEach((r) => {
-    const f = new THREE.Mesh(new THREE.PlaneGeometry(r.mw, r.md), new THREE.MeshStandardMaterial({ color: FLOOR_COLOURS[r.kind] || '#cfc9bd', roughness: 0.9 }));
+    const kind = FLOORS[FLOOR_OF[r.kind] || 'plain'], tex = kind.tex.clone(); tex.repeat.set(r.mw / kind.edge, r.md / kind.edge); tex.needsUpdate = true;
+    const f = new THREE.Mesh(new THREE.PlaneGeometry(r.mw, r.md), new THREE.MeshStandardMaterial({ map: tex, roughness: kind.rough, metalness: 0.02 }));
     f.rotation.x = -Math.PI / 2; f.position.set(r.mx + r.mw / 2, r.kind === 'balcony' ? -0.02 : 0, r.mz + r.md / 2); f.receiveShadow = true; f.userData.room = r; flatGroup.add(f);
   });
-  const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(bounds.x1 - bounds.x0 + 1, bounds.z1 - bounds.z0 + 1), new THREE.MeshStandardMaterial({ color: '#f4f1eb', roughness: 1, side: THREE.DoubleSide }));
+  const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(bounds.x1 - bounds.x0 + 1, bounds.z1 - bounds.z0 + 1), new THREE.MeshStandardMaterial({ map: ceilingTex, roughness: 1, side: THREE.DoubleSide }));
   ceiling.rotation.x = Math.PI / 2; ceiling.position.set(centre.x, WALL_H, centre.z); flatGroup.add(ceiling);
+  // a light in every room, and a ceiling fan in the rooms people sit in
+  const lampMat = new THREE.MeshStandardMaterial({ color: '#fff6e4', emissive: '#ffe8b8', emissiveIntensity: 1.6, roughness: 0.5 });
+  const fanMat = new THREE.MeshStandardMaterial({ color: '#e9e4da', roughness: 0.5, metalness: 0.3 });
+  const fans = [];
+  rooms.forEach((r) => {
+    if (r.kind === 'balcony') return;
+    const cx = r.mx + r.mw / 2, cz = r.mz + r.md / 2, sits = ['living', 'dining', 'bed'].includes(r.kind) && r.mw > 2.4 && r.md > 2.4;
+    const lamp = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.18, 0.05, 20), lampMat); lamp.position.set(cx + (sits ? Math.min(0.9, r.mw * 0.3) : 0), WALL_H - 0.03, cz); flatGroup.add(lamp);
+    if (!sits) return;
+    const fan = new THREE.Group(); fan.position.set(cx, WALL_H - 0.35, cz);
+    const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.35, 6), fanMat); rod.position.y = 0.175; fan.add(rod);
+    fan.add(new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.12, 16), fanMat));
+    const blades = new THREE.Group(); blades.position.y = -0.03;
+    for (let i = 0; i < 3; i++) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.012, 0.11), fanMat); b.position.x = 0.36; const arm = new THREE.Group(); arm.rotation.y = (i / 3) * Math.PI * 2; arm.add(b); blades.add(arm); }
+    fan.add(blades); flatGroup.add(fan); fans.push(blades);
+  });
 
   // every room edge goes on a line; each line is cut into pieces by the ends of rooms, doors and openings
   const lines = new Map();
@@ -115,6 +158,16 @@ function init() {
     const m = new THREE.Mesh(new THREE.BoxGeometry(dir === 'h' ? len : thick, y1 - y0, dir === 'h' ? thick : len), mat);
     m.position.set(dir === 'h' ? M((p + qq) / 2) : M(c), (y0 + y1) / 2, dir === 'h' ? M(c) : M((p + qq) / 2));
     m.castShadow = m.receiveShadow = true; flatGroup.add(m);
+    if (mat === wallMat && y0 === 0) { const sk = new THREE.Mesh(new THREE.BoxGeometry(dir === 'h' ? len : thick + 0.03, 0.1, dir === 'h' ? thick + 0.03 : len), skirtMat); sk.position.set(m.position.x, 0.05, m.position.z); flatGroup.add(sk); }
+  };
+  const doorAt = (dir, c, p, qq) => { // a frame round the opening and a leaf standing open on its hinge
+    const w = M(qq - p); if (w < 0.5) return;
+    const jamb = (at) => { const j = new THREE.Mesh(new THREE.BoxGeometry(dir === 'h' ? 0.06 : WALL_T + 0.04, DOOR_H, dir === 'h' ? WALL_T + 0.04 : 0.06), frameMat); j.position.set(dir === 'h' ? M(at) : M(c), DOOR_H / 2, dir === 'h' ? M(c) : M(at)); flatGroup.add(j); };
+    jamb(p); jamb(qq);
+    const hinge = new THREE.Group(); hinge.position.set(dir === 'h' ? M(p) + 0.03 : M(c), 0, dir === 'h' ? M(c) : M(p) + 0.03);
+    const leaf = new THREE.Mesh(new THREE.BoxGeometry(w - 0.08, DOOR_H - 0.04, 0.04), doorMat); leaf.position.set((w - 0.08) / 2, DOOR_H / 2, 0); leaf.castShadow = true;
+    const knob = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 6), railMat); knob.position.set(w - 0.2, 1.0, 0.04);
+    hinge.add(leaf, knob); hinge.rotation.y = (dir === 'h' ? 0 : -Math.PI / 2) + 1.25; flatGroup.add(hinge);
   };
   for (const L of lines.values()) {
     const cuts = [...new Set([...L.items.flatMap((i) => [i.a, i.b]), ...L.doors.flatMap((d) => [d[0], d[1]]), ...L.opens.flatMap((o) => [o[0], o[1]])].map((v) => +v.toFixed(3)))].sort((a, b) => a - b);
@@ -125,7 +178,7 @@ function init() {
       if (!covering.length) continue;
       const seg = L.dir === 'h' ? [M(p), M(L.c), M(qq), M(L.c)] : [M(L.c), M(p), M(L.c), M(qq)];
       const door = L.doors.find((d) => d[0] - 0.01 <= mid && d[1] + 0.01 >= mid);
-      if (door) { openings.push(seg); piece(L.dir, L.c, p, qq, DOOR_H, WALL_H, wallMat); if (door[2]) piece(L.dir, L.c, p, qq, 0.02, DOOR_H, glassMat, 0.03); continue; } // a balcony door is glass
+      if (door) { openings.push(seg); piece(L.dir, L.c, p, qq, DOOR_H, WALL_H, wallMat); if (door[2]) piece(L.dir, L.c, p, qq, 0.02, DOOR_H, glassMat, 0.03); else doorAt(L.dir, L.c, p, qq); continue; } // a balcony door is glass
       if (L.opens.some((o) => o[0] - 0.01 <= mid && o[1] + 0.01 >= mid)) { openings.push(seg); continue; }
       const outer = covering.length === 1, room = covering[0].room;
       if (outer && room.kind === 'balcony') { piece(L.dir, L.c, p, qq, 0, 0.12, railMat, 0.1); piece(L.dir, L.c, p, qq, 0.98, 1.05, railMat, 0.06); for (let s = p + 0.5; s < qq; s += 1.5) piece(L.dir, L.c, s, s + 0.12, 0.1, 1.0, railMat, 0.05); continue; }
@@ -142,21 +195,34 @@ function init() {
 
   // ---------- the world outside: the ground far below, the neighbours, the other blocks as masses ----------
   const drop = -(here.floor * FLOOR_H + 1);
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(900, 900), new THREE.MeshStandardMaterial({ color: '#8f9361', roughness: 1 }));
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(900, 900), new THREE.MeshStandardMaterial({ map: grassTex, roughness: 1 }));
   ground.rotation.x = -Math.PI / 2; ground.position.y = drop; ground.receiveShadow = true; scene.add(ground);
-  const below = new THREE.Mesh(new THREE.BoxGeometry(bounds.x1 - bounds.x0 + 6, -drop - 0.3, bounds.z1 - bounds.z0 + 6), new THREE.MeshStandardMaterial({ color: '#e4d9c5', roughness: 0.9 }));
+  const facadeMat = new THREE.MeshStandardMaterial({ map: facadeTex, roughness: 0.9 }), slabMat = new THREE.MeshStandardMaterial({ color: '#cfc6b8', roughness: 1 });
+  const below = new THREE.Mesh(new THREE.BoxGeometry(bounds.x1 - bounds.x0 + 6, -drop - 0.3, bounds.z1 - bounds.z0 + 6), [facadeMat, facadeMat, slabMat, slabMat, facadeMat, facadeMat]);
+  facadeTex.repeat.set(Math.round((bounds.x1 - bounds.x0 + 6) / 3.5), Math.max(1, here.floor));
   below.position.set(centre.x, drop + (-drop - 0.3) / 2, centre.z); scene.add(below); // the floors under this one
   let seed = 5; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
-  const hoods = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: '#dfd4c2', roughness: 0.95 }), 70);
+  const hoodTex = facadeTex.clone(); hoodTex.repeat.set(5, 5); hoodTex.needsUpdate = true;
+  const hoods = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ map: hoodTex, roughness: 0.95 }), 70);
   const dummy = new THREE.Object3D();
   for (let i = 0; i < 70; i++) {
     const a = rnd() * 6.283, dist = 60 + rnd() * 300, w = 10 + rnd() * 16, fl = 1 + Math.floor(rnd() * 9);
     dummy.position.set(centre.x + Math.cos(a) * dist, drop + (fl * 3.2) / 2, centre.z + Math.sin(a) * dist); dummy.scale.set(w, fl * 3.2, w * (0.6 + rnd())); dummy.rotation.set(0, rnd() * 3, 0); dummy.updateMatrix(); hoods.setMatrixAt(i, dummy.matrix);
   }
   scene.add(hoods);
-  const trees = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(2.4, 0), new THREE.MeshStandardMaterial({ color: '#4f8a3c', roughness: 1, flatShading: true }), 160);
+  const trees = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(2.4, 1), new THREE.MeshStandardMaterial({ color: '#4f8a3c', roughness: 1 }), 160);
   for (let i = 0; i < 160; i++) { const a = rnd() * 6.283, dist = 25 + rnd() * 300; dummy.position.set(centre.x + Math.cos(a) * dist, drop + 2.5, centre.z + Math.sin(a) * dist); dummy.scale.setScalar(0.8 + rnd()); dummy.rotation.set(0, 0, 0); dummy.updateMatrix(); trees.setMatrixAt(i, dummy.matrix); }
   scene.add(trees);
+  // the sky: a dome with a haze at the horizon and the afternoon sun in it
+  const sky = new THREE.Mesh(new THREE.SphereGeometry(500, 24, 12), new THREE.ShaderMaterial({
+    uniforms: { top: { value: new THREE.Color('#3b78c6') }, horizon: { value: new THREE.Color('#e4e6e0') }, sunDir: { value: new THREE.Vector3(-0.45, 0.6, 0.55).normalize() }, sunColor: { value: new THREE.Color('#ffd79a') } },
+    side: THREE.BackSide, depthWrite: false, fog: false,
+    vertexShader: 'varying vec3 vDir; void main() { vec4 w = modelMatrix * vec4(position, 1.0); vDir = normalize(w.xyz - cameraPosition); gl_Position = projectionMatrix * viewMatrix * w; }',
+    fragmentShader: `uniform vec3 top; uniform vec3 horizon; uniform vec3 sunDir; uniform vec3 sunColor; varying vec3 vDir;
+      void main() { vec3 d = normalize(vDir); float t = pow(clamp(d.y, 0.0, 1.0), 0.45); vec3 c = mix(horizon, top, t);
+        float s = max(dot(d, sunDir), 0.0); c += sunColor * (pow(s, 4.0) * 0.2 + pow(s, 48.0) * 0.7 + pow(s, 900.0) * 3.0); gl_FragColor = vec4(c, 1.0); }`,
+  }));
+  sky.renderOrder = -1; scene.add(sky);
 
   // ---------- light ----------
   const sun = new THREE.DirectionalLight('#fff1dc', 2.6);
@@ -370,6 +436,8 @@ function init() {
     walkCam.position.copy(walker.pos);
     walkCam.rotation.set(0, 0, 0); walkCam.rotation.order = 'YXZ'; walkCam.rotation.y = walker.yaw; walkCam.rotation.x = -walker.pitch;
     marker.position.set(walker.pos.x, 0.06, walker.pos.z); marker.rotation.y = walker.yaw;
+    sky.position.copy(walker.pos);
+    if (!reduced) fans.forEach((b) => { b.rotation.y += dt * 7; });
     renderer.render(scene, cam());
     placeLabels();
     raf = requestAnimationFrame(render);
