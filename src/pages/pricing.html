@@ -1,0 +1,116 @@
+<!-- page {"title": "Prices and EMI · Aranya Estates", "description": "Every home we are selling with its price, the payment plan, what is included, and a reader that works out the monthly EMI.", "nav": "pricing", "path": "/pricing.html", "bodyClass": "pricing-page"} -->
+<section class="page-hero" aria-labelledby="page-title">
+  <img src="./assets/mulshi-lake-in-maharashtra-img-20211220-083702.jpg" srcset="./assets/mulshi-lake-in-maharashtra-img-20211220-083702-900.jpg 900w, ./assets/mulshi-lake-in-maharashtra-img-20211220-083702.jpg 1800w" sizes="100vw" alt="Evening light over a lake in the hills" width="1800" height="1012" fetchpriority="high">
+  <div class="page-hero-foot">
+    <h1 class="display" id="page-title">What a home costs,<br>all of it</h1>
+    <p>Every price on this page is the whole price before stamp duty and registration. No floor rise, no view charge, no surprise at the agreement.</p>
+  </div>
+</section>
+
+<section class="menu wrap" aria-labelledby="menu-title">
+  <div class="menu-grid">
+    <div class="menu-side" data-reveal>
+      <h2 id="menu-title">The price list</h2>
+      <img src="./assets/verdant-sahyadri-hills-900.jpg" alt="Green hills and a lake under monsoon cloud" width="900" height="1200" loading="lazy">
+      <p>Carpet areas as per RERA. Pick a home and the reader below works out the monthly figure.</p>
+    </div>
+    <div class="menu-list" data-reveal style="--i:1">
+      <div class="menu-group"><h3>Verdant Ridge</h3>
+        <div class="menu-item"><span><button type="button" data-pick-home="18700000" aria-pressed="true">3 BHK, 1,648 sq ft</button><small>Two balconies west, a utility yard that is not a cupboard</small></span><span class="price">₹1.87 Cr</span></div>
+        <div class="menu-item"><span><button type="button" data-pick-home="22100000" aria-pressed="false">3 BHK with study, 1,912 sq ft</button><small>The study has its own window and a door that shuts</small></span><span class="price">2.21 Cr</span></div>
+        <div class="menu-item"><span><button type="button" data-pick-home="29400000" aria-pressed="false">4 BHK, 2,465 sq ft</button><small>Corner homes only, hills on two sides</small></span><span class="price">2.94 Cr</span></div>
+        <div class="menu-item"><span><button type="button" data-pick-home="41200000" aria-pressed="false">4 BHK penthouse, 3,180 sq ft</button><small>Twelve of them, with a private terrace of 640 sq ft</small></span><span class="price">4.12 Cr</span></div>
+        <div class="menu-item"><span>Second car bay<small>Underground, next to the first</small></span><span class="price">6.5 L</span></div>
+      </div>
+      <div class="menu-group"><h3>Aranya Terraces, Baner</h3>
+        <div class="menu-item"><span><button type="button" data-pick-home="9450000" aria-pressed="false">2 BHK, 1,085 sq ft</button><small>Every home has a terrace the size of a bedroom</small></span><span class="price">₹94.5 L</span></div>
+        <div class="menu-item"><span><button type="button" data-pick-home="13200000" aria-pressed="false">3 BHK, 1,420 sq ft</button><small>Ready to move; nine left</small></span><span class="price">1.32 Cr</span></div>
+      </div>
+      <div class="menu-group"><h3>Mulshi Lake Villas</h3>
+        <div class="menu-item"><span><button type="button" data-pick-home="56000000" aria-pressed="false">4 BHK villa, 3,640 sq ft</button><small>On a 6,500 sq ft plot, with its own lake path</small></span><span class="price">₹5.60 Cr</span></div>
+        <div class="menu-item"><span>Shore plot, first row<small>Six of the twenty eight touch the lake path</small></span><span class="price">6.15 Cr</span></div>
+      </div>
+      <div class="menu-group"><h3>On top of the price</h3>
+        <div class="menu-item"><span>Stamp duty and registration<small>Maharashtra, as it stands this year</small></span><span class="price">6% + ₹30,000</span></div>
+        <div class="menu-item"><span>GST on under construction homes<small>Verdant Ridge and the villas; nothing on the Terraces</small></span><span class="price">5%</span></div>
+        <div class="menu-item"><span>Society formation and legal<small>Collected once, at possession</small></span><span class="price">₹45,000</span></div>
+        <div class="menu-item"><span>Sinking fund<small>Held by the society, not by us</small></span><span class="price">₹60 a sq ft</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="emi" id="emi" data-reveal>
+    <div class="emi-controls">
+      <h2>Read the monthly figure</h2>
+      <p>Set the down payment and the years, and the number on the right is the EMI a bank would quote today.</p>
+      <fieldset>
+        <legend>The home</legend>
+        <select id="emi-home" aria-label="Home">
+          <option value="18700000">Verdant Ridge, 3 BHK · ₹1.87 Cr</option>
+          <option value="22100000">Verdant Ridge, 3 BHK with study · ₹2.21 Cr</option>
+          <option value="29400000">Verdant Ridge, 4 BHK · ₹2.94 Cr</option>
+          <option value="41200000">Verdant Ridge, penthouse · ₹4.12 Cr</option>
+          <option value="9450000">Aranya Terraces, 2 BHK · ₹94.5 L</option>
+          <option value="13200000">Aranya Terraces, 3 BHK · ₹1.32 Cr</option>
+          <option value="56000000">Mulshi Lake Villas, 4 BHK · ₹5.60 Cr</option>
+        </select>
+      </fieldset>
+      <fieldset>
+        <legend>The loan</legend>
+        <label for="emi-down"><span>Down payment</span><output id="emi-down-out" for="emi-down">20%</output></label>
+        <input type="range" id="emi-down" min="10" max="60" step="5" value="20">
+        <label for="emi-years"><span>Tenure</span><output id="emi-years-out" for="emi-years">20 years</output></label>
+        <input type="range" id="emi-years" min="5" max="30" step="1" value="20">
+        <label for="emi-rate"><span>Interest</span><output id="emi-rate-out" for="emi-rate">8.65% a year</output></label>
+        <input type="range" id="emi-rate" min="7" max="11" step="0.05" value="8.65">
+      </fieldset>
+    </div>
+    <div class="emi-result" aria-live="polite">
+      <p class="figure"><span id="emi-figure" tabindex="-1">₹1,31,000</span><small>a month, for the term</small></p>
+      <dl>
+        <dt>Home price</dt><dd id="emi-price">₹1.87 Cr</dd>
+        <dt>Loan amount</dt><dd id="emi-loan">₹1.50 Cr</dd>
+        <dt>Interest over the term</dt><dd id="emi-total-interest">₹1.64 Cr</dd>
+        <dt>Total you pay</dt><dd id="emi-total">₹3.51 Cr</dd>
+      </dl>
+      <p class="note">A reading, not an offer. Banks price the rate on your profile; our loan desk gets quotes from four lenders in two working days.</p>
+    </div>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="plan-title">
+  <div class="wrap pair">
+    <div class="text">
+    <h2 class="head" id="plan-title" data-reveal>How the money goes, for an under construction home</h2>
+    <ol class="timeline" data-reveal style="--i:1">
+      <li><b>Booking</b><p>₹2 L to hold the home for 21 days while the agreement is drafted. Returned in full if you walk away in that time.</p></li>
+      <li><b>Agreement</b><p>10% of the price less the booking amount, with the registered agreement to sell. Stamp duty is paid here.</p></li>
+      <li><b>By slab</b><p>70% in fourteen calls as each slab of your block is cast, with a photograph and the engineer’s certificate every time. Your bank pays these against the certificate.</p></li>
+      <li><b>At the keys</b><p>The last 20% on the occupation certificate, with the society charges and the sinking fund. Then the keys.</p></li>
+    </ol>
+    </div>
+    <figure class="pic" data-reveal style="--i:2"><img src="./assets/a-beautiful-mula-river-in-the-monsoon-900.jpg" alt="The Mula river winding through green fields under heavy cloud" width="900" height="601" loading="lazy"><figcaption>The Mula below the ridge, the way the money also runs: in stages.</figcaption></figure>
+  </div>
+</section>
+
+<section class="wrap section" aria-labelledby="included-title">
+  <div class="pair">
+    <div class="text" data-reveal>
+      <h2 id="included-title">What the price includes</h2>
+      <p>One car bay underground, the club membership for the household, full power backup, piped gas, the modular kitchen with a hob and chimney, wardrobes in every bedroom, a water purifier, and the balcony grilles. Air conditioning points in every room, with the machines left to you.</p>
+      <p>Not included: the second car bay, the furniture in the sample home, and whatever the society later decides to add.</p>
+      <p><a class="link-plain" href="./faq.html">Questions about loans, GST and possession</a></p>
+    </div>
+    <figure class="pic" data-reveal style="--i:1"><img src="./assets/fortified-wall-visapur-fort-pune-maharashtra.jpg" srcset="./assets/fortified-wall-visapur-fort-pune-maharashtra-900.jpg 900w, ./assets/fortified-wall-visapur-fort-pune-maharashtra.jpg 1728w" sizes="(max-width: 60em) 100vw, 50vw" alt="A dark basalt wall on a green hillside" width="1728" height="1296" loading="lazy"><figcaption>Basalt, dressed on site, the one thing we never cut from the budget.</figcaption></figure>
+  </div>
+</section>
+
+{{> ask}}
+
+<section class="cta-band wrap" aria-labelledby="cta-title">
+  <div class="inner" data-reveal>
+    <h2 id="cta-title">Bring the numbers up</h2>
+    <p>The loan desk sits in the sales lounge and will put four bank quotes side by side for you in two working days.</p>
+    <a class="button" href="./book-a-visit.html">Book a site visit</a>
+  </div>
+</section>

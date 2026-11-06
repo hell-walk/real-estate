@@ -1,0 +1,7 @@
+node_modules/
+.taste-skill/inspect/
+.taste-skill/before/
+.taste-skill/after/
+data/
+site/
+shots/

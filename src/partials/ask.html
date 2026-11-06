@@ -1,0 +1,23 @@
+<section class="band paper" id="ask" aria-labelledby="ask-title">
+  <div class="wrap pair">
+    <div class="text" data-reveal>
+      <h2 id="ask-title">Ask the lounge</h2>
+      <p>A question that is not answered here goes to Anita at the desk. We reply by phone or email within a working day, and the question joins this page if others are likely to ask it.</p>
+    </div>
+    <div class="pic" data-reveal style="--i:1">
+      <form data-enquiry method="post" action="/api/enquiries" novalidate>
+        <input type="hidden" name="page" value="{{path}}">
+        <div class="form-row"><label class="label" for="q-name">Your name</label><input class="field" id="q-name" name="name" type="text" autocomplete="name" required></div>
+        <div class="form-row"><label class="label" for="q-contact">Mobile or email</label><input class="field" id="q-contact" name="contact" type="text" autocomplete="tel" required></div>
+        <div class="form-row"><label class="label" for="q-topic">About</label><select class="field" id="q-topic" name="topic"><option value="question">A question</option><option value="price-sheet">The price sheet by email</option><option value="loan">A home loan</option><option value="callback">A call back</option></select></div>
+        <div class="form-row"><label class="label" for="q-message">The question</label><textarea class="field" id="q-message" name="message" rows="4" required></textarea></div>
+        <p class="error-text" data-enquiry-error aria-live="polite"></p>
+        <button class="button ink" type="submit" style="margin-top: 1rem">Send it to the desk</button>
+      </form>
+      <div class="success" hidden>
+        <h3 class="lead" tabindex="-1">Got it</h3>
+        <p>Your question is with the desk as <strong data-ref>Q-0000</strong>. We reply within a working day.</p>
+      </div>
+    </div>
+  </div>
+</section>
