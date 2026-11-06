@@ -1,0 +1,13 @@
+{
+  "name": "ratan-galaxy-sample-site",
+  "private": true,
+  "type": "module",
+  "description": "Unofficial sample website for Ratan Galaxy, Vrindavan Yojna, Lucknow: a Three.js model of the site, a 3D flat viewer, bookings and an admin desk.",
+  "scripts": {
+    "start": "node server.mjs",
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0"
+  }
+}

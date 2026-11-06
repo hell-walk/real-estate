@@ -1,78 +1,100 @@
-<!-- page {"title": "Verdant Ridge, homes above Pune · Aranya Estates", "description": "Verdant Ridge: 212 three and four bedroom homes on 14 acres of ridge above Pune, by Aranya Estates. Book a site visit.", "nav": "home", "path": "/index.html", "bodyClass": "home", "head": "<script type=\"importmap\">{\"imports\":{\"three\":\"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js\"}}</script>", "scripts": "<script type=\"module\" src=\"./js/hero3d.js\"></script>"} -->
+<!-- page {"title": "Ratan Galaxy, Vrindavan Yojna, Lucknow · a sample site", "description": "Ratan Galaxy: 378 two, three and four bedroom homes in three blocks on 4.16 acres in Sector 12, Vrindavan Yojna, off Shaheed Path, Lucknow. Walk the society in 3D, open any flat, book a site visit. An unofficial sample site.", "nav": "home", "path": "/index.html", "bodyClass": "home", "head": "<script type=\"importmap\">{\"imports\":{\"three\":\"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js\"}}</script>", "scripts": "<script type=\"module\" src=\"./js/hero3d.js\"></script>"} -->
 <section class="hero" id="top" aria-labelledby="hero-title">
   <div class="hero-stage" id="hero-stage" aria-hidden="true">
     <img src="./assets/hero-fallback.jpg" alt="" width="1600" height="900" fetchpriority="high">
   </div>
+  <div class="hero-ui" id="hero-ui" hidden>
+    <div class="hero-ui-buttons">
+      <button type="button" class="button" data-tour>Take the tour</button>
+      <button type="button" class="button ghost" data-pick>Find a flat</button>
+    </div>
+    <p class="hero-caption" data-caption hidden></p>
+  </div>
+  <div class="hero-pick" id="hero-pick" hidden>
+    <button type="button" class="pick-close" data-close>Close</button>
+    <h2 data-where>Pick a flat</h2>
+    <p class="pick-type" data-type>Click any flat on the towers, or choose one here.</p>
+    <p class="pick-facts" data-facts></p>
+    <div class="pick-actions"><a class="button ink" data-open href="./flat.html">Open it in 3D</a></div>
+    <form method="get" action="./flat.html">
+      <div class="form-grid three">
+        <div><label class="label" for="hp-block">Block</label><select class="field" id="hp-block" name="block"><option>A</option><option>B</option><option>C</option></select></div>
+        <div><label class="label" for="hp-floor">Floor</label><select class="field" id="hp-floor" name="floor"><option>1</option><option>2</option><option>3</option><option>4</option><option selected>5</option><option>6</option><option>7</option><option>8</option><option>9</option></select></div>
+        <div><label class="label" for="hp-flat">Flat</label><select class="field" id="hp-flat" name="flat"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option></select></div>
+      </div>
+      <p><button class="button ink wide" type="submit">Show it</button></p>
+    </form>
+  </div>
   <div class="hero-foot">
-    <h1 class="hero-title" id="hero-title">Verdant Ridge,<br>homes above Pune</h1>
+    <h1 class="hero-title" id="hero-title">Ratan Galaxy,<br>Vrindavan Yojna</h1>
     <div class="hero-side">
-      <p>212 three and four bedroom homes on 14 acres of ridge, twenty minutes from Baner. Possession from December 2028.</p>
+      <p>378 two, three and four bedroom homes in three blocks on 4.16 acres in Sector 12, off Shaheed Path, Lucknow. Ready to move. Walk the society above, then open any flat in 3D.</p>
       <a class="button" href="./book-a-visit.html">Book a site visit</a>
     </div>
   </div>
 </section>
 
-<section class="statement wrap" aria-label="What the ridge gives you">
-  <p>At 420 metres the city is a floor of lights far below you. Every home faces the hills, and nobody will ever build in front of them.</p>
+<section class="statement wrap" aria-label="What the society gives you">
+  <p>Seven in ten square metres stay open. Three blocks of nine floors stand on the rest, the pool and the club at one end, the courts at the other.</p>
 </section>
 
 <section class="showcase" aria-labelledby="projects-title">
-  <img src="./assets/verdant-sahyadri-hills.jpg" srcset="./assets/verdant-sahyadri-hills-900.jpg 900w, ./assets/verdant-sahyadri-hills.jpg 1800w" sizes="100vw" alt="Green Sahyadri hills and a lake under monsoon cloud" width="1800" height="2400" loading="lazy">
+  <img src="./assets/lucknow-park.jpg" srcset="./assets/lucknow-park-900.jpg 900w, ./assets/lucknow-park.jpg 1800w" sizes="100vw" alt="Janeshwar Mishra Park in Lucknow, lawns and a lake under a wide sky" width="1800" height="1086" loading="lazy">
   <div class="showcase-copy" data-reveal>
-    <h2 id="projects-title">Three places to live on the ridge road, and one we finished.</h2>
-    <p>Each spec sheet below is the one we hand out at the gate.</p>
+    <h2 id="projects-title">Three blocks, two phases, both finished.</h2>
+    <p>Each sheet below is the one the lounge hands out at the gate.</p>
   </div>
-  <ul class="slips" aria-label="Projects">
+  <ul class="slips" aria-label="The blocks and the homes">
     <li class="slip" data-reveal style="--i:0; --tilt:-1.5deg; height:44svh">
-      <strong>Verdant Ridge</strong><span class="rule" aria-hidden="true">· · · · · · · · · · · · · · · · · · ·</span>
-      <dl><dt>Where</dt><dd>Ridge road, Bavdhan</dd><dt>Homes</dt><dd>212 in 6 blocks</dd><dt>Sizes</dt><dd>3 and 4 BHK</dd><dt>From</dt><dd>₹1.87 Cr</dd><dt>Possession</dt><dd>Dec 2028</dd><dt>Open ground</dt><dd>71%</dd></dl>
-      <a class="slip-more arrow" href="./projects/verdant-ridge.html">See the project</a>
+      <strong>Block A</strong><span class="rule" aria-hidden="true">· · · · · · · · · · · · · · · · · · ·</span>
+      <dl><dt>Phase</dt><dd>II, finished Nov 2024</dd><dt>Homes</dt><dd>126 over 9 floors</dd><dt>Sizes</dt><dd>2, 3 and 4 BHK</dd><dt>Ground floor</dt><dd>11 shops</dd><dt>RERA</dt><dd>UPRERAPRJ718664</dd></dl>
+      <a class="slip-more arrow" href="./towers/block-a.html">See the block</a>
     </li>
     <li class="slip" data-reveal style="--i:1; --tilt:0deg; height:36svh">
-      <strong>Aranya Terraces</strong><span class="rule" aria-hidden="true">· · · · · · · · · · · · · · · · · · ·</span>
-      <dl><dt>Where</dt><dd>Baner hill</dd><dt>Homes</dt><dd>96 terraced</dd><dt>Sizes</dt><dd>2 and 3 BHK</dd><dt>From</dt><dd>₹94.5 L</dd><dt>Status</dt><dd>Ready to move</dd></dl>
-      <a class="slip-more arrow" href="./projects/aranya-terraces.html">See the project</a>
+      <strong>Block B</strong><span class="rule" aria-hidden="true">· · · · · · · · · · · · · · · · · · ·</span>
+      <dl><dt>Phase</dt><dd>I, finished June 2018</dd><dt>Homes</dt><dd>126, all 2 BHK</dd><dt>Sizes</dt><dd>994 to 1,294 sq ft</dd><dt>Parking</dt><dd>Basement</dd></dl>
+      <a class="slip-more arrow" href="./towers/block-b.html">See the block</a>
     </li>
     <li class="slip" data-reveal style="--i:2; --tilt:0deg; height:40svh">
-      <strong>Mulshi Lake Villas</strong><span class="rule" aria-hidden="true">· · · · · · · · · · · · · · · · · · ·</span>
-      <dl><dt>Where</dt><dd>Mulshi, lakeside</dd><dt>Homes</dt><dd>28 villas</dd><dt>Sizes</dt><dd>4 BHK, 3,640 sq ft</dd><dt>From</dt><dd>₹5.60 Cr</dd><dt>Launch</dt><dd>March 2027</dd></dl>
-      <a class="slip-more arrow" href="./projects/mulshi-lake-villas.html">See the project</a>
+      <strong>Block C</strong><span class="rule" aria-hidden="true">· · · · · · · · · · · · · · · · · · ·</span>
+      <dl><dt>Phase</dt><dd>I, finished June 2018</dd><dt>Homes</dt><dd>126 over 9 floors</dd><dt>Sizes</dt><dd>2, 3 and 4 BHK</dd><dt>Parking</dt><dd>Basement</dd></dl>
+      <a class="slip-more arrow" href="./towers/block-c.html">See the block</a>
     </li>
     <li class="slip" data-reveal style="--i:3; --tilt:1.5deg; height:30svh">
-      <strong>Koregaon Court</strong><span class="rule" aria-hidden="true">· · · · · · · · · · · · · · · · · · ·</span>
-      <dl><dt>Where</dt><dd>Koregaon Park</dd><dt>Homes</dt><dd>48, all sold</dd><dt>Finished</dt><dd>May 2019</dd><dt>Resale</dt><dd>₹2.3 Cr upward</dd></dl>
-      <a class="slip-more arrow" href="./projects/#finished">Our record</a>
+      <strong>The homes</strong><span class="rule" aria-hidden="true">· · · · · · · · · · · · · · · · · · ·</span>
+      <dl><dt>2 BHK</dt><dd>994 to 1,141 sq ft</dd><dt>3 BHK</dt><dd>1,747 and 1,917 sq ft</dd><dt>4 BHK</dt><dd>2,366 sq ft</dd><dt>Every home</dt><dd>Store, two balconies</dd></dl>
+      <a class="slip-more arrow" href="./homes.html">The floor plans</a>
     </li>
     <li class="slip" data-reveal style="--i:4; --tilt:0deg; height:33svh">
-      <strong>Payment plan</strong><span class="rule" aria-hidden="true">· · · · · · · · · · · · · · · · · · ·</span>
-      <dl><dt>Booking</dt><dd>₹2 L</dd><dt>On agreement</dt><dd>10%</dd><dt>By slab</dt><dd>70%, in 14 calls</dd><dt>At keys</dt><dd>remaining 20%</dd></dl>
+      <strong>Payment plan, sample</strong><span class="rule" aria-hidden="true">· · · · · · · · · · · · · · · · · · ·</span>
+      <dl><dt>Token</dt><dd>₹2 L</dd><dt>On agreement</dt><dd>10%</dd><dt>On registration</dt><dd>The rest</dd><dt>Loans</dt><dd>Five banks approved</dd></dl>
       <a class="slip-more arrow" href="./pricing.html">Prices and EMI</a>
     </li>
     <li class="slip" data-reveal style="--i:5; --tilt:-1deg; height:38svh">
       <strong>Site visit</strong><span class="rule" aria-hidden="true">· · · · · · · · · · · · · · · · · · ·</span>
-      <dl><dt>Days</dt><dd>Every day</dd><dt>Hours</dt><dd>10:00 to 19:00</dd><dt>Pickup</dt><dd>From Baner, weekends</dd><dt>Takes</dt><dd>About 90 minutes</dd></dl>
+      <dl><dt>Days</dt><dd>Every day</dd><dt>Hours</dt><dd>10:00 to 19:00</dd><dt>Where</dt><dd>Society office at the gate</dd><dt>Takes</dt><dd>About an hour</dd></dl>
       <a class="slip-more arrow" href="./book-a-visit.html">Book a slot</a>
     </li>
   </ul>
 </section>
 
 <section class="rows wrap" aria-labelledby="rows-title">
-  <div class="rows-head"><h2 class="display" id="rows-title" data-reveal>What fourteen acres is for</h2></div>
+  <div class="rows-head"><h2 class="display" id="rows-title" data-reveal>What four acres is for</h2></div>
   <div class="row">
-    <div class="row-body" data-reveal><h3>Seven in ten acres stay open</h3><p>Six blocks of eleven floors on 29% of the land. The rest is the stream, the old mango grove, two lawns and the walking loop of 1.4 km along the ridge edge.</p></div>
-    <figure class="row-pic r1" data-reveal style="--i:1"><img src="./assets/mulshi-lake-in-maharashtra-img-20211220-083702-900.jpg" alt="A still lake at sunset with a dry branch in front" width="900" height="506" loading="lazy"><figcaption>Evening light over Mulshi, the direction every balcony faces.</figcaption></figure>
+    <div class="row-body" data-reveal><h3>Seven in ten stay open</h3><p>Three blocks on 16,851 square metres, and about seventy per cent of it left as lawn, garden, courts and the pool. The blocks stand in a row along the plot, so every balcony looks over ground, not at the next tower.</p></div>
+    <figure class="row-pic r1" data-reveal style="--i:1"><img src="./assets/lucknow-park-900.jpg" alt="Lawns and a lake at Janeshwar Mishra Park, Lucknow" width="900" height="543" loading="lazy"><figcaption>Janeshwar Mishra Park, the big green on this side of the city, a short drive away.</figcaption></figure>
   </div>
   <div class="row">
-    <div class="row-body" data-reveal><h3>Built from the hill itself</h3><p>The basalt cut for the foundations is dressed on site and comes back as the boundary wall, the clubhouse plinth and the stream steps. Nothing is carted away.</p></div>
-    <figure class="row-pic r2" data-reveal style="--i:1"><img src="./assets/fortified-wall-visapur-fort-pune-maharashtra-900.jpg" alt="A dark basalt fort wall on a green hillside" width="900" height="675" loading="lazy"><figcaption>Deccan basalt, the same stone the forts around Pune are made of.</figcaption></figure>
+    <div class="row-body" data-reveal><h3>Built in two phases, both done</h3><p>Blocks B and C went up first, basement, ground and nine floors, and were handed over in June 2018. Block A followed with nine floors over eleven shops on the ground floor, finished in November 2024. Nothing here is a promise about the future.</p></div>
+    <figure class="row-pic r2" data-reveal style="--i:1"><img src="./assets/lucknow-shaheed-path-900.jpg" alt="Shaheed Path in Lucknow, a wide road past new apartment blocks" width="900" height="401" loading="lazy"><figcaption>Shaheed Path, the ring road the society sits off, two to three kilometres from the gate.</figcaption></figure>
   </div>
   <div class="row">
-    <div class="row-body" data-reveal><h3>A club with a view, not a lobby</h3><p>A 24,000 sq ft clubhouse on the western edge: a 25 m lap pool, a gym that opens onto the lawn, a library, two squash courts and a terrace for the monsoon.</p></div>
-    <figure class="row-pic r3" data-reveal style="--i:1"><img src="./assets/picturesque-mahabhaleshwar-panchghani-5767643681-900.jpg" alt="Layered cliffs and valleys of the Sahyadri" width="900" height="675" loading="lazy"><figcaption>The ridges to the south west, seen from the terrace side.</figcaption></figure>
+    <div class="row-body" data-reveal><h3>A club at the east end</h3><p>The round clubhouse with its hall and gym, the swimming pool and the kids' pool, the sand pit and the amphitheatre steps sit together at the east end of the plot. The tennis and basketball courts are at the west end, past Block C.</p></div>
+    <figure class="row-pic r3" data-reveal style="--i:1"><img src="./assets/lucknow-ekana-900.jpg" alt="Ekana cricket stadium in Lucknow, seen across the outfield" width="900" height="499" loading="lazy"><figcaption>Ekana stadium, ten minutes down Shaheed Path on a match day.</figcaption></figure>
   </div>
   <div class="row">
-    <div class="row-body" data-reveal><h3>The school run is twelve minutes</h3><p>Three schools within 4 km, a hospital with an emergency ward at 6 km, and the Hinjawadi IT parks at 18 minutes by the ridge road, with no city traffic in between.</p></div>
-    <figure class="row-pic r4" data-reveal style="--i:1"><img src="./assets/a-beautiful-mula-river-in-the-monsoon-900.jpg" alt="The Mula river winding through green fields towards the city in monsoon" width="900" height="601" loading="lazy"><figcaption>The valley floor and the city edge, from the ridge.</figcaption></figure>
+    <div class="row-body" data-reveal><h3>The hospital is ten minutes</h3><p>SGPGI and Medanta are three to four kilometres away, Lucknow Public School about one, and Lulu Mall and Phoenix Palassio are on Shaheed Path within five. The airport is about eleven kilometres by the same road.</p></div>
+    <figure class="row-pic r4" data-reveal style="--i:1"><img src="./assets/lucknow-riverfront-900.jpg" alt="The Gomti riverfront in Lucknow, a paved walk beside the water" width="900" height="416" loading="lazy"><figcaption>The Gomti riverfront, for the evening walk when the society's track is too short.</figcaption></figure>
   </div>
 </section>
 
@@ -81,24 +103,24 @@
   <div class="wrap">
     <article class="sheet" data-reveal>
       <h2 id="sheet-title">From the gate</h2>
-      <p class="note">Driving times on a weekday at 8:30 in the morning, measured by our own car over October.</p>
+      <p class="note">Distances as the listings give them, by road from Sector 12. Driving times are a sample reading on a weekday morning.</p>
       <div class="sheet-group"><h3>Work</h3>
-        <div class="sheet-item"><span>Hinjawadi, Phase 1<small>By the ridge road and the bypass</small></span><span class="price">18 min</span></div>
-        <div class="sheet-item"><span>Baner Road offices<small>Down the hill, then straight</small></span><span class="price">21 min</span></div>
-        <div class="sheet-item"><span>Kothrud<small>Through Bavdhan</small></span><span class="price">24 min</span></div>
-        <div class="sheet-item"><span>Pune station<small>Via the university road</small></span><span class="price">47 min</span></div>
+        <div class="sheet-item"><span>Shaheed Path<small>The ring road, two to three kilometres</small></span><span class="price">6 min</span></div>
+        <div class="sheet-item"><span>Gomti Nagar Extension<small>Offices and the new blocks, six kilometres</small></span><span class="price">15 min</span></div>
+        <div class="sheet-item"><span>Hazratganj<small>The old centre, twelve kilometres</small></span><span class="price">30 min</span></div>
+        <div class="sheet-item"><span>Charbagh station<small>Nine kilometres</small></span><span class="price">28 min</span></div>
       </div>
       <div class="sheet-group"><h3>Every day</h3>
-        <div class="sheet-item"><span>Nearest school<small>Three within four kilometres</small></span><span class="price">12 min</span></div>
-        <div class="sheet-item"><span>Emergency ward<small>Multi speciality hospital, Bavdhan</small></span><span class="price">9 min</span></div>
-        <div class="sheet-item"><span>Supermarket and chemist<small>At the foot of the ridge road</small></span><span class="price">7 min</span></div>
-        <div class="sheet-item"><span>The expressway<small>Mumbai in two hours fifty</small></span><span class="price">16 min</span></div>
+        <div class="sheet-item"><span>Lucknow Public School<small>About one kilometre</small></span><span class="price">4 min</span></div>
+        <div class="sheet-item"><span>SGPGI and Medanta<small>Three to four kilometres</small></span><span class="price">10 min</span></div>
+        <div class="sheet-item"><span>Lulu Mall and Phoenix Palassio<small>On Shaheed Path, within five kilometres</small></span><span class="price">12 min</span></div>
+        <div class="sheet-item"><span>Ambedkar University<small>About three kilometres</small></span><span class="price">8 min</span></div>
       </div>
       <div class="sheet-group"><h3>Weekends</h3>
-        <div class="sheet-item"><span>Mulshi lake<small>Past the dam, by the back road</small></span><span class="price">38 min</span></div>
-        <div class="sheet-item"><span>The airport<small>Lohegaon, in light traffic</small></span><span class="price">62 min</span></div>
+        <div class="sheet-item"><span>Janeshwar Mishra Park<small>Up Shaheed Path</small></span><span class="price">14 min</span></div>
+        <div class="sheet-item"><span>The airport<small>Chaudhary Charan Singh, eleven kilometres</small></span><span class="price">25 min</span></div>
       </div>
-      <div class="sheet-hours"><p>Sales lounge at the gate, Monday to Saturday 10:00 to 19:00</p><p>Sunday 11:00 to 17:00</p></div>
+      <div class="sheet-hours"><p>Sales lounge in the society office at the gate, Monday to Saturday 10:00 to 19:00</p><p>Sunday 11:00 to 17:00 · sample hours</p></div>
     </article>
   </div>
 </section>
@@ -107,22 +129,22 @@
   <div class="menu-grid">
     <div class="menu-side" data-reveal>
       <h2 id="menu-title">What a home costs</h2>
-      <img src="./assets/view-of-western-ghats-from-rajmachi-point-900.jpg" alt="Houses on a green ridge above a highway cutting through the hills" width="900" height="591" loading="lazy">
-      <p>Carpet areas as per RERA. Prices are all in, before stamp duty and registration. Pick a home and the reader below works out the monthly figure.</p>
+      <img src="./assets/lucknow-street-900.jpg" alt="Hazratganj in Lucknow, cream colonnades along a renovated street" width="900" height="611" loading="lazy">
+      <p>Sample asking prices for resale at about ₹6,900 a square foot of super area, before stamp duty and registration. Carpet areas are the RERA figures. Pick a home and the reader below works out the monthly figure.</p>
     </div>
     <div class="menu-list" data-reveal style="--i:1">
-      <div class="menu-group"><h3>Verdant Ridge</h3>
-        <div class="menu-item"><span><button type="button" data-pick-home="18700000" aria-pressed="true">3 BHK, 1,648 sq ft</button><small>Two balconies west, a utility yard that is not a cupboard</small></span><span class="price">₹1.87 Cr</span></div>
-        <div class="menu-item"><span><button type="button" data-pick-home="22100000" aria-pressed="false">3 BHK with study, 1,912 sq ft</button><small>The study has its own window and a door that shuts</small></span><span class="price">2.21 Cr</span></div>
-        <div class="menu-item"><span><button type="button" data-pick-home="29400000" aria-pressed="false">4 BHK, 2,465 sq ft</button><small>Corner homes only, hills on two sides</small></span><span class="price">2.94 Cr</span></div>
-        <div class="menu-item"><span><button type="button" data-pick-home="41200000" aria-pressed="false">4 BHK penthouse, 3,180 sq ft</button><small>Twelve of them, with a private terrace of 640 sq ft</small></span><span class="price">4.12 Cr</span></div>
+      <div class="menu-group"><h3>Blocks A and C</h3>
+        <div class="menu-item"><span><button type="button" data-pick-home="7870000" aria-pressed="false">2 BHK, 1,141 sq ft</button><small>Flats 4, 5, 11 and 14 on each floor; two balconies and a store</small></span><span class="price">₹78.7 L</span></div>
+        <div class="menu-item"><span><button type="button" data-pick-home="12100000" aria-pressed="false">3 BHK, 1,747 sq ft</button><small>Flats 2, 7, 9 and 12; three balconies</small></span><span class="price">1.21 Cr</span></div>
+        <div class="menu-item"><span><button type="button" data-pick-home="13200000" aria-pressed="true">3 BHK with servant's room, 1,917 sq ft</button><small>Flats 3, 6, 10 and 13; the servant's room has its own toilet by the door</small></span><span class="price">1.32 Cr</span></div>
+        <div class="menu-item"><span><button type="button" data-pick-home="16300000" aria-pressed="false">4 BHK, 2,366 sq ft</button><small>Flats 1 and 8, the ends of the X; two dressing rooms, four toilets</small></span><span class="price">1.63 Cr</span></div>
       </div>
-      <div class="menu-group"><h3>Aranya Terraces, Baner</h3>
-        <div class="menu-item"><span><button type="button" data-pick-home="9450000" aria-pressed="false">2 BHK, 1,085 sq ft</button><small>Every home has a terrace the size of a bedroom</small></span><span class="price">₹94.5 L</span></div>
-        <div class="menu-item"><span><button type="button" data-pick-home="13200000" aria-pressed="false">3 BHK, 1,420 sq ft</button><small>Ready to move; eleven homes left</small></span><span class="price">1.32 Cr</span></div>
+      <div class="menu-group"><h3>Block B</h3>
+        <div class="menu-item"><span><button type="button" data-pick-home="6860000" aria-pressed="false">2 BHK, 994 sq ft</button><small>Drawing room of ten by seventeen, two bedrooms of ten by twelve</small></span><span class="price">₹68.6 L</span></div>
+        <div class="menu-item"><span><button type="button" data-pick-home="7590000" aria-pressed="false">2 BHK, 1,100 sq ft</button><small>The larger corner variant</small></span><span class="price">75.9 L</span></div>
       </div>
-      <div class="menu-group"><h3>Mulshi Lake Villas</h3>
-        <div class="menu-item"><span><button type="button" data-pick-home="56000000" aria-pressed="false">4 BHK villa, 3,640 sq ft</button><small>On a 6,500 sq ft plot, with its own lake path</small></span><span class="price">₹5.60 Cr</span></div>
+      <div class="menu-group"><h3>Block A, ground floor</h3>
+        <div class="menu-item"><span><button type="button" data-pick-home="4500000" aria-pressed="false">Shop, 11 to 15 sq m</button><small>Eleven of them, facing the drive; ₹38 L to ₹52 L</small></span><span class="price">₹45 L</span></div>
       </div>
     </div>
   </div>
@@ -130,17 +152,17 @@
   <div class="emi" id="emi" data-reveal>
     <div class="emi-controls">
       <h2>Read the monthly figure</h2>
-      <p>Set the down payment and the years, and the number on the right is the EMI a bank would quote today.</p>
+      <p>Set the down payment and the years, and the number on the right is the EMI a bank would quote today on the sample price.</p>
       <fieldset>
         <legend>The home</legend>
         <select id="emi-home" aria-label="Home">
-          <option value="18700000">Verdant Ridge, 3 BHK · ₹1.87 Cr</option>
-          <option value="22100000">Verdant Ridge, 3 BHK with study · ₹2.21 Cr</option>
-          <option value="29400000">Verdant Ridge, 4 BHK · ₹2.94 Cr</option>
-          <option value="41200000">Verdant Ridge, penthouse · ₹4.12 Cr</option>
-          <option value="9450000">Aranya Terraces, 2 BHK · ₹94.5 L</option>
-          <option value="13200000">Aranya Terraces, 3 BHK · ₹1.32 Cr</option>
-          <option value="56000000">Mulshi Lake Villas, 4 BHK · ₹5.60 Cr</option>
+          <option value="6860000">Block B, 2 BHK 994 sq ft · ₹68.6 L</option>
+          <option value="7590000">Block B, 2 BHK 1,100 sq ft · ₹75.9 L</option>
+          <option value="7870000">Blocks A and C, 2 BHK · ₹78.7 L</option>
+          <option value="12100000">Blocks A and C, 3 BHK · ₹1.21 Cr</option>
+          <option value="13200000" selected>Blocks A and C, 3 BHK with servant's room · ₹1.32 Cr</option>
+          <option value="16300000">Blocks A and C, 4 BHK · ₹1.63 Cr</option>
+          <option value="4500000">Block A, shop · ₹45 L</option>
         </select>
       </fieldset>
       <fieldset>
@@ -154,60 +176,60 @@
       </fieldset>
     </div>
     <div class="emi-result" aria-live="polite">
-      <p class="figure"><span id="emi-figure" tabindex="-1">₹1,31,000</span><small>a month, for the term</small></p>
+      <p class="figure"><span id="emi-figure" tabindex="-1">₹92,500</span><small>a month, for the term</small></p>
       <dl>
-        <dt>Home price</dt><dd id="emi-price">₹1.87 Cr</dd>
-        <dt>Loan amount</dt><dd id="emi-loan">₹1.50 Cr</dd>
-        <dt>Interest over the term</dt><dd id="emi-total-interest">₹1.64 Cr</dd>
-        <dt>Total you pay</dt><dd id="emi-total">₹3.51 Cr</dd>
+        <dt>Home price</dt><dd id="emi-price">₹1.32 Cr</dd>
+        <dt>Loan amount</dt><dd id="emi-loan">₹1.06 Cr</dd>
+        <dt>Interest over the term</dt><dd id="emi-total-interest">₹1.16 Cr</dd>
+        <dt>Total you pay</dt><dd id="emi-total">₹2.48 Cr</dd>
       </dl>
-      <p class="note">A reading, not an offer. Banks price the rate on your profile; our loan desk gets quotes from four lenders in two working days.</p>
+      <p class="note">A reading, not an offer. Banks price the rate on your profile. Axis, Bank of Baroda, HDFC, ICICI and Punjab National Bank have approved the project on the listings.</p>
     </div>
   </div>
 </section>
 
 <figure class="quote" aria-label="A note from a sample resident">
-  <img src="./assets/mulshi-lake-the-sahyadri-ranges.jpg" srcset="./assets/mulshi-lake-the-sahyadri-ranges-900.jpg 900w, ./assets/mulshi-lake-the-sahyadri-ranges.jpg 1800w" sizes="100vw" alt="A calm lake with a boulder in the foreground and hills behind" width="1800" height="1350" loading="lazy">
+  <img src="./assets/lucknow-ambedkar-park.jpg" srcset="./assets/lucknow-ambedkar-park-900.jpg 900w, ./assets/lucknow-ambedkar-park.jpg 1800w" sizes="100vw" alt="The sandstone domes and columns of Ambedkar Memorial Park, Lucknow" width="1800" height="1200" loading="lazy">
   <div class="quote-text">
-    <blockquote data-reveal><p>“We bought at the Terraces for the terrace. Three monsoons later it is where we eat, work and argue about the news. The hills have not moved.”</p></blockquote>
-    <figcaption data-reveal style="--i:1">Rukmini and Tanay Bhide<span>Aranya Terraces, since 2023 · sample note, not a real review</span></figcaption>
+    <blockquote data-reveal><p>“We took a three bedroom in Block C in 2019 for the school run. The children learnt to swim in the society pool, and we have not needed to go anywhere since.”</p></blockquote>
+    <figcaption data-reveal style="--i:1">Shalini and Devesh Srivastava<span>Block C, since 2019 · sample note, not a real review</span></figcaption>
   </div>
 </figure>
 
 <section class="faq-split" aria-labelledby="faq-title">
   <div class="wrap faq-grid">
     <div class="faq-col">
-      <h2 id="faq-title" data-reveal>Before you come up</h2>
+      <h2 id="faq-title" data-reveal>Before you come</h2>
       <ul class="faq-facts" data-reveal style="--i:1">
-        <li>Sales lounge at the gate, Ridge Road past Bavdhan, Pune 411021</li>
-        <li>Monday to Saturday 10:00 to 19:00, Sunday 11:00 to 17:00</li>
-        <li>Free pickup from Baner on Saturdays and Sundays, booked a day ahead</li>
+        <li>Sales lounge in the society office at the gate, GH-01 and GH-02, Sector 12, Vrindavan Yojna, Lucknow 226029</li>
+        <li>Monday to Saturday 10:00 to 19:00, Sunday 11:00 to 17:00, sample hours</li>
+        <li>Off Amar Shaheed Path, past Lucknow Public School; parking inside the gate</li>
         <li data-open-now>Sales lounge hours above</li>
       </ul>
       <div class="faq-list" data-one-open data-reveal style="--i:2">
-        <details><summary>Is Verdant Ridge RERA registered?</summary><p>Yes. The project carries a Maharashtra RERA registration; on this sample site the number is a placeholder and the certificate is shown at the lounge.</p></details>
-        <details><summary>What is the possession date, and what if it slips?</summary><p>December 2028 for blocks A to D, June 2029 for E and F. The agreement sets a penalty of ₹14 per sq ft a month to you after a six month grace period.</p></details>
-        <details><summary>How is the ridge road in the monsoon?</summary><p>Tarred and lit for the full 3.8 km since 2022, with a storm drain on the hill side. We have run the lounge through three monsoons without a closed day.</p></details>
-        <details><summary>Can I bring my own bank for the loan?</summary><p>Yes. Seven banks have approved the project; any of them can lend without a fresh legal check. Others take about three weeks.</p></details>
-        <details><summary>What are the monthly maintenance charges?</summary><p>₹4.20 per sq ft, fixed for the first two years, which covers the club, security, the lifts and the gardens. A sinking fund of ₹60 per sq ft is collected once at possession.</p></details>
-        <details><summary>Are there homes for people who work from home?</summary><p>The 3 BHK with study was drawn for that. The study is 9 by 10 feet with its own window, a door and a wired data point.</p></details>
+        <details><summary>Is Ratan Galaxy RERA registered?</summary><p>Yes, in two phases. Phase I, Blocks B and C, is UPRERAPRJ8949. Phase II, Block A, is UPRERAPRJ718664. The promoter is Ratan Housing Development Limited, UPRERAPRM15031.</p></details>
+        <details><summary>Is it ready to move in?</summary><p>Yes. Blocks B and C were completed on 30 June 2018 and Block A on 13 November 2024. What is on sale now is resale from owners, and the shops in Block A.</p></details>
+        <details><summary>Which flats are which on a floor?</summary><p>In Blocks A and C each floor has fourteen homes: two four bedroom at the ends of the X, eight three bedroom and four two bedroom. Block B is all two bedroom. The 3D viewer opens any of them by block, floor and number.</p></details>
+        <details><summary>Can I bring my own bank for the loan?</summary><p>The listings name Axis, Bank of Baroda, HDFC, ICICI and Punjab National Bank as approved. Others will want the usual legal check on a resale.</p></details>
+        <details><summary>What are the monthly maintenance charges?</summary><p>A sample figure of ₹2.50 per sq ft a month is used on this site, which covers the club, security, the lifts, the pool and the gardens. The society's actual charge is set by its owners' association.</p></details>
+        <details><summary>Is this the builder's website?</summary><p>No. This is an unofficial sample site. The blocks, floors and room sizes follow the public RERA records and the builder's published plans; the prices, the people and the lounge are invented and labelled as samples.</p></details>
       </div>
       <div class="faq-actions" data-reveal style="--i:3"><a class="button" href="./book-a-visit.html">Book a site visit</a><a class="link-plain" href="./faq.html">All the questions</a></div>
     </div>
     <figure class="faq-pics" data-reveal>
-      <img class="tall" src="./assets/verdant-sahyadri-hills-900.jpg" alt="A lake below green hills, with rain coming" width="900" height="1200" loading="lazy">
-      <img class="square" src="./assets/a-beautiful-mula-river-in-the-monsoon-900.jpg" alt="The Mula river in monsoon, seen from a hill" width="900" height="601" loading="lazy">
+      <img class="tall" src="./assets/lucknow-imambara-900.jpg" alt="The Rumi Darwaza in Lucknow in afternoon light" width="900" height="600" loading="lazy">
+      <img class="square" src="./assets/lucknow-riverfront-900.jpg" alt="The Gomti riverfront walk in Lucknow" width="900" height="416" loading="lazy">
     </figure>
   </div>
 </section>
 
 <section class="visit" aria-labelledby="visit-title">
-  <img src="./assets/view-of-western-ghats-from-rajmachi-point.jpg" srcset="./assets/view-of-western-ghats-from-rajmachi-point-900.jpg 900w, ./assets/view-of-western-ghats-from-rajmachi-point.jpg 1800w" sizes="100vw" alt="Houses along a green ridge above a valley, a highway below" width="1800" height="1183">
+  <img src="./assets/lucknow-shaheed-path.jpg" srcset="./assets/lucknow-shaheed-path-900.jpg 900w, ./assets/lucknow-shaheed-path.jpg 1800w" sizes="100vw" alt="Apartment blocks along Shaheed Path in Lucknow" width="1800" height="802">
   <div class="visit-inner">
     <div class="visit-card" data-reveal>
       <h2 id="visit-title">Book a site visit</h2>
-      <div class="address"><p>Sales lounge at the gate<br>Ridge Road, past Bavdhan, Pune 411021</p></div>
-      <dl class="hours"><dt>Monday to Saturday</dt><dd>10:00 to 19:00</dd><dt>Sunday</dt><dd>11:00 to 17:00</dd><dt>Phone</dt><dd><a href="tel:+912067670000">+91 20 6767 0000</a></dd></dl>
+      <div class="address"><p>Sales lounge, society office at the gate<br>GH-01 and GH-02, Sector 12, Vrindavan Yojna, Lucknow 226029</p></div>
+      <dl class="hours"><dt>Monday to Saturday</dt><dd>10:00 to 19:00</dd><dt>Sunday</dt><dd>11:00 to 17:00</dd><dt>Phone, sample</dt><dd><a href="tel:+915224000000">+91 522 400 0000</a></dd></dl>
       <form data-booking method="post" action="/api/bookings" novalidate>
         <div class="form-row"><label class="label" for="v-name">Your name</label><input class="field" id="v-name" name="name" type="text" autocomplete="name" required><p class="error-text" data-error-for="name" aria-live="polite"></p></div>
         <div class="form-row"><label class="label" for="v-phone">Mobile</label><input class="field" id="v-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required aria-describedby="v-phone-hint"><p class="hint" id="v-phone-hint">10 digits, we call to confirm</p><p class="error-text" data-error-for="phone" aria-live="polite"></p></div>
@@ -216,13 +238,13 @@
           <div><label class="label" for="v-date">Date</label><input class="field" id="v-date" name="date" type="date" required><p class="error-text" data-error-for="date" aria-live="polite"></p></div>
           <div><label class="label" for="v-slot">Time</label><select class="field" id="v-slot" name="slot" aria-describedby="v-slot-hint"><option>10:30</option><option>12:00</option><option selected>15:00</option><option>17:00</option></select><p class="hint" id="v-slot-hint" data-slot-hint>Three visits a slot</p><p class="error-text" data-error-for="slot" aria-live="polite"></p></div>
         </div>
-        <div class="form-row"><label class="label" for="v-project">Which project</label><select class="field" id="v-project" name="project"><option>Verdant Ridge</option><option>Aranya Terraces</option><option>Mulshi Lake Villas</option></select></div>
+        <div class="form-row"><label class="label" for="v-project">Which block</label><select class="field" id="v-project" name="project"><option>Block A</option><option>Block B</option><option>Block C</option><option>Any block</option></select></div>
         <input type="hidden" name="config" value="">
         <button class="button ink wide" type="submit">Book the visit</button>
       </form>
       <div class="success" hidden>
         <h3 class="lead" tabindex="-1">Your visit is pencilled in</h3>
-        <p>Reference <strong data-ref>AR-0000</strong>. <span data-project>Verdant Ridge</span> on <span data-when></span>. We call within a working day to confirm the time.</p>
+        <p>Reference <strong data-ref>AR-0000</strong>. <span data-project>Block A</span> on <span data-when></span>. We call within a working day to confirm the time.</p>
         <a class="button ink wide" data-booking-link href="/booking/">See or cancel the booking</a>
         <p><button type="button" class="link-plain" data-again>Book another slot</button></p>
       </div>

@@ -1,11 +1,11 @@
-<!-- page {"title": "Book a site visit · Aranya Estates", "description": "Book a visit to Verdant Ridge, Aranya Terraces or the Mulshi shore. Every day, about ninety minutes, free pickup from Baner on weekends.", "nav": "book", "path": "/book-a-visit.html", "bodyClass": "book-page"} -->
+<!-- page {"title": "Book a site visit · Ratan Galaxy, Lucknow", "description": "Book a visit to Ratan Galaxy in Vrindavan Yojna: pick a block, a date and a time, and the lounge at the gate confirms by phone. Every day, about an hour.", "nav": "book", "path": "/book-a-visit.html", "bodyClass": "book-page"} -->
 <section class="visit" aria-labelledby="visit-title">
-  <img src="./assets/verdant-sahyadri-hills.jpg" srcset="./assets/verdant-sahyadri-hills-900.jpg 900w, ./assets/verdant-sahyadri-hills.jpg 1800w" sizes="100vw" alt="A lake below green hills with rain coming in" width="1800" height="2400" fetchpriority="high">
+  <img src="./assets/lucknow-park.jpg" srcset="./assets/lucknow-park-900.jpg 900w, ./assets/lucknow-park.jpg 1800w" sizes="100vw" alt="The lake at Janeshwar Mishra Park, Lucknow, at dusk" width="1800" height="1086" fetchpriority="high">
   <div class="visit-inner">
     <div class="visit-card">
       <h1 id="visit-title" class="head">Book a site visit</h1>
-      <div class="address"><p>Sales lounge at the gate<br>Ridge Road, past Bavdhan, Pune 411021</p></div>
-      <dl class="hours"><dt>Monday to Saturday</dt><dd>10:00 to 19:00</dd><dt>Sunday</dt><dd>11:00 to 17:00</dd><dt>Phone</dt><dd><a href="tel:+912067670000">+91 20 6767 0000</a></dd></dl>
+      <div class="address"><p>Sales lounge at the gate (sample)<br>GH-01 and GH-02, Sector 12, Vrindavan Yojna, Lucknow 226029</p></div>
+      <dl class="hours"><dt>Monday to Saturday</dt><dd>10:00 to 19:00</dd><dt>Sunday</dt><dd>11:00 to 17:00</dd><dt>Phone</dt><dd><a href="tel:+915224000000">+91 522 400 0000</a></dd></dl>
       <form data-booking method="post" action="/api/bookings" novalidate>
         <div class="form-row"><label class="label" for="v-name">Your name</label><input class="field" id="v-name" name="name" type="text" autocomplete="name" required><p class="error-text" data-error-for="name" aria-live="polite"></p></div>
         <div class="form-row"><label class="label" for="v-phone">Mobile</label><input class="field" id="v-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required aria-describedby="v-phone-hint"><p class="hint" id="v-phone-hint">10 digits, we call to confirm</p><p class="error-text" data-error-for="phone" aria-live="polite"></p></div>
@@ -14,14 +14,14 @@
           <div><label class="label" for="v-date">Date</label><input class="field" id="v-date" name="date" type="date" required><p class="error-text" data-error-for="date" aria-live="polite"></p></div>
           <div><label class="label" for="v-slot">Time</label><select class="field" id="v-slot" name="slot" aria-describedby="v-slot-hint"><option>10:30</option><option>12:00</option><option selected>15:00</option><option>17:00</option></select><p class="hint" id="v-slot-hint" data-slot-hint>Three visits a slot</p><p class="error-text" data-error-for="slot" aria-live="polite"></p></div>
         </div>
-        <div class="form-row"><label class="label" for="v-project">Which project</label><select class="field" id="v-project" name="project"><option>Verdant Ridge</option><option>Aranya Terraces</option><option>Mulshi Lake Villas</option></select></div>
-        <div class="form-row"><label class="label" for="v-config">Looking for</label><select class="field" id="v-config" name="config"><option value="">Not sure yet</option><option>2 BHK</option><option>3 BHK</option><option>3 BHK with study</option><option>4 BHK</option><option>Penthouse</option><option>Villa</option></select></div>
-        <div class="form-row"><label class="label" for="v-notes">Anything we should know</label><textarea class="field" id="v-notes" name="notes" rows="3" placeholder="Pickup from Baner, a pram, a parent who would rather not climb"></textarea></div>
+        <div class="form-row"><label class="label" for="v-project">Which block</label><select class="field" id="v-project" name="project"><option>Block A</option><option>Block B</option><option>Block C</option><option>Any block</option></select></div>
+        <div class="form-row"><label class="label" for="v-config">Looking for</label><select class="field" id="v-config" name="config"><option value="">Not sure yet</option><option>2 BHK</option><option>3 BHK</option><option>4 BHK</option></select></div>
+        <div class="form-row"><label class="label" for="v-notes">Anything we should know</label><textarea class="field" id="v-notes" name="notes" rows="3" placeholder="The flat you opened in 3D, a pram, a parent who would rather take the lift"></textarea></div>
         <button class="button ink wide" type="submit">Book the visit</button>
       </form>
       <div class="success" hidden>
         <h3 class="lead" tabindex="-1">Your visit is pencilled in</h3>
-        <p>Reference <strong data-ref>AR-0000</strong>. <span data-project>Verdant Ridge</span> on <span data-when></span>. We call within a working day to confirm the time.</p>
+        <p>Reference <strong data-ref>AR-0000</strong>. <span data-project>Block A</span> on <span data-when></span>. We call within a working day to confirm the time.</p>
         <a class="button ink wide" data-booking-link href="/booking/">See or cancel the booking</a>
         <p><button type="button" class="link-plain" data-again>Book another slot</button></p>
       </div>
@@ -33,10 +33,10 @@
   <div class="wrap">
     <h2 class="head" id="then-title" data-reveal>What a visit looks like</h2>
     <ol class="timeline" data-reveal style="--i:1">
-      <li><b>The day before</b><p>Anita or Rohan calls to confirm the slot and, on weekends, the pickup from the Baner Court office at 9:30, 11:30 or 14:30.</p></li>
-      <li><b>At the gate</b><p>Twenty minutes in the lounge with the model, the plans and the chai. Bring the names of the people who will decide; it saves a second trip.</p></li>
-      <li><b>On the ridge</b><p>The walk: the loop to the stream steps, the club site and the sample home on the second floor of block A. About an hour, in shoes for a hill.</p></li>
-      <li><b>After</b><p>A plan set and the price sheet for the homes you liked, by email the same evening. Nobody calls you until you call us, unless you asked us to.</p></li>
+      <li><b>Before</b><p>Open the flat you want to see in <a class="link-plain" href="./flat.html">the 3D viewer</a> and note the block, floor and number. Nidhi calls the day before to confirm the slot and sends a pin for the gate.</p></li>
+      <li><b>At the gate</b><p>Fifteen minutes in the lounge with the master plan, the floor plans and the chart of what is for sale. Bring the people who will decide; it saves a second trip.</p></li>
+      <li><b>In the block</b><p>The lift to the floor, the flat itself if the owner has agreed, and a look at the one above or below if not. Then the club, the pool and the track. About an hour.</p></li>
+      <li><b>After</b><p>The plan set and the price sheet for the homes you liked, by email the same evening. Nobody calls you until you call us, unless you asked us to.</p></li>
     </ol>
   </div>
 </section>

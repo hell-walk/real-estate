@@ -1,40 +1,47 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-labelledby="map-title map-desc">
-  <title id="map-title">Sketch map of the ridge road above Pune</title>
-  <desc id="map-desc">A drawn map: the ridge road climbs west from Bavdhan to the Verdant Ridge gate, with Baner and Hinjawadi to the north, Kothrud and the city to the east, and the Mulshi road running south west.</desc>
+  <title id="map-title">Sketch map of south Lucknow</title>
+  <desc id="map-desc">A drawn map: the Gomti river curves across the north with Hazratganj and Gomti Nagar beyond it, Shaheed Path runs across the middle past Ekana stadium and the malls, Sultanpur Road leaves it to the south east, SGPGI and the airport lie to the south west, and the Ratan Galaxy gate sits in Vrindavan Yojna below Shaheed Path.</desc>
   <rect width="1600" height="1000" fill="#0c0a08"/>
-  <g fill="none" stroke="#3d362d" stroke-width="3">
-    <path d="M80 820c120-80 160-220 330-260s240 60 410 10 180-230 380-250 300 60 400 20"/>
-    <path d="M40 900c140-90 200-250 360-300s260 70 440 10 170-260 390-280 320 70 410 30"/>
-    <path d="M120 740c110-70 150-190 300-230s220 50 380 0 170-210 350-230 280 50 380 10"/>
-    <path d="M180 660c90-60 140-160 270-200s200 40 350-10 150-190 320-210 260 40 360 0"/>
-    <path d="M240 590c80-50 130-130 240-170s180 30 320-10 140-170 300-190 240 30 340-10"/>
-    <path d="M300 520c70-40 120-100 220-140s160 20 290-10 130-150 270-170 220 20 320-20"/>
-  </g>
+  <path d="M0 0h1600v120c-220 40-380 140-560 150S720 210 520 240 180 330 0 300z" fill="#1d1915"/>
+  <path d="M0 300c180 30 340-30 520-60s340-10 520 30 340 10 560-50" fill="none" stroke="#2f2a24" stroke-width="34" stroke-linecap="round"/>
+  <path d="M0 300c180 30 340-30 520-60s340-10 520 30 340 10 560-50" fill="none" stroke="#3d362d" stroke-width="3"/>
   <g fill="#181512">
-    <path d="M0 0h1600v160c-200 60-400 30-600 80s-350 170-600 120S120 300 0 240z" fill="#1d1915"/>
-    <path d="M1100 1000c60-120 160-200 300-220s200-80 200-80v300z"/>
+    <path d="M1120 40c110 20 200 90 300 110s180-30 180-30V0H1120z"/>
+    <path d="M1180 660c80 60 160 160 170 340h250V560c-120 20-250 20-420 100z"/>
+    <path d="M0 1000V720c120-30 220 20 320 80s120 140 140 200z"/>
   </g>
-  <path d="M1500 180c-90 70-120 200-240 260s-260 20-380 110-150 220-300 250" fill="none" stroke="#3b332a" stroke-width="22" stroke-linecap="round"/>
-  <path d="M1500 180c-90 70-120 200-240 260s-260 20-380 110-150 220-300 250" fill="none" stroke="#c9a45a" stroke-width="4" stroke-dasharray="14 10" stroke-linecap="round"/>
-  <path d="M580 800c-120 20-220 60-320 110" fill="none" stroke="#3b332a" stroke-width="14" stroke-linecap="round"/>
-  <path d="M880 550c-60 120-80 220-70 330" fill="none" stroke="#3b332a" stroke-width="12" stroke-linecap="round"/>
+  <path d="M60 560c180-40 340-30 520-10s360 40 540 10 300-60 440-40" fill="none" stroke="#3b332a" stroke-width="24" stroke-linecap="round"/>
+  <path d="M60 560c180-40 340-30 520-10s360 40 540 10 300-60 440-40" fill="none" stroke="#c9a45a" stroke-width="4" stroke-dasharray="14 10" stroke-linecap="round"/>
+  <path d="M1000 548c60 80 110 190 150 300s60 110 80 150" fill="none" stroke="#3b332a" stroke-width="14" stroke-linecap="round"/>
+  <path d="M430 553c-90 100-180 200-270 330" fill="none" stroke="#3b332a" stroke-width="14" stroke-linecap="round"/>
+  <path d="M640 553c0 90 10 190 20 290" fill="none" stroke="#3b332a" stroke-width="10" stroke-linecap="round"/>
+  <path d="M540 700h260" fill="none" stroke="#3b332a" stroke-width="10" stroke-linecap="round"/>
+  <path d="M900 300c-30 90-50 170-60 250" fill="none" stroke="#3b332a" stroke-width="10" stroke-linecap="round"/>
   <g fill="#f3eee4" font-family="Clash Grotesk, Segoe UI, system-ui, sans-serif" font-size="26">
-    <text x="1350" y="140">Baner</text>
-    <text x="1160" y="80">Hinjawadi</text>
-    <text x="1420" y="470">Kothrud</text>
-    <text x="1250" y="560">Bavdhan</text>
-    <text x="420" y="960">Mulshi road</text>
-    <text x="1480" y="820">City</text>
-    <text x="900" y="930">Pashan lake</text>
+    <text x="300" y="110">Hazratganj</text>
+    <text x="520" y="190">Gomti river</text>
+    <text x="900" y="110">Gomti Nagar</text>
+    <text x="1240" y="110">Gomti Nagar Extension</text>
+    <text x="1040" y="200">Janeshwar Mishra Park</text>
+    <text x="760" y="250">Ambedkar Park</text>
+    <text x="700" y="500">Ekana stadium</text>
+    <text x="1020" y="470">Lulu Mall</text>
+    <text x="1180" y="400">Phoenix Palassio</text>
+    <text x="1300" y="520">Shaheed Path</text>
+    <text x="1180" y="760">Sultanpur Road</text>
+    <text x="240" y="770">SGPGI</text>
+    <text x="90" y="960">Airport, 11 km</text>
+    <text x="120" y="520">Kanpur Road</text>
+    <text x="1480" y="960" text-anchor="end">Kisan Path</text>
   </g>
   <g>
-    <circle cx="580" cy="800" r="16" fill="#c9a45a"/>
-    <circle cx="580" cy="800" r="30" fill="none" stroke="#c9a45a" stroke-width="2"/>
-    <text x="620" y="790" fill="#c9a45a" font-family="Clash Grotesk, Segoe UI, system-ui, sans-serif" font-size="30" font-weight="500">Verdant Ridge gate</text>
-    <text x="620" y="826" fill="#a39d95" font-family="Clash Grotesk, Segoe UI, system-ui, sans-serif" font-size="22">420 m · the ridge road</text>
+    <circle cx="680" cy="700" r="16" fill="#c9a45a"/>
+    <circle cx="680" cy="700" r="30" fill="none" stroke="#c9a45a" stroke-width="2"/>
+    <text x="720" y="690" fill="#c9a45a" font-family="Clash Grotesk, Segoe UI, system-ui, sans-serif" font-size="30" font-weight="500">Ratan Galaxy gate</text>
+    <text x="720" y="726" fill="#a39d95" font-family="Clash Grotesk, Segoe UI, system-ui, sans-serif" font-size="22">Sector 12, Vrindavan Yojna · 2 to 3 km off Shaheed Path</text>
   </g>
   <g fill="#a39d95" font-family="Clash Grotesk, Segoe UI, system-ui, sans-serif" font-size="20">
     <text x="60" y="60">Sketch, not to scale</text>
-    <text x="1480" y="970" text-anchor="end">N ↑</text>
+    <text x="1480" y="900" text-anchor="end">N ↑</text>
   </g>
 </svg>

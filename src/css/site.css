@@ -1,4 +1,4 @@
-/* Aranya Estates — site stylesheet.
+/* Ratan Galaxy sample site — stylesheet.
    Direction: "The place carries it" (taste-skill sheet, seed 1859751874). Warm black ground, white ink, one gold accent.
    One typeface (Clash Grotesk), five type steps, square corners, no rules, no gradients, no shadows at rest. */
 
@@ -538,4 +538,86 @@ ul.slips { position: absolute; left: 0; right: 0; bottom: 0; display: flex; alig
   .price-sheet td.num { text-align: right; }
   .price-sheet td[data-h]::before { content: attr(data-h); color: var(--muted); }
   .price-sheet td:empty { display: none; }
+}
+
+/* ---------- the hero's controls: the tour and the flat picker, on the scene ---------- */
+.hero-ui { position: absolute; left: var(--margin); top: 6.5rem; z-index: 3; display: flex; flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+.hero-ui[hidden] { display: none; }
+.hero-ui-buttons { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.hero-caption { max-width: 34ch; font-size: var(--step-small); line-height: 1.45; color: var(--ink); padding: 0.5rem 0.75rem; background: rgba(12, 10, 8, 0.55); min-height: 2.4rem; }
+.hero-caption:empty { display: none; }
+.hero-pick { position: absolute; right: var(--margin); top: 6.5rem; z-index: 4; width: min(360px, calc(100% - 2 * var(--margin))); background: var(--paper); color: var(--paper-ink); padding: 1.5rem; }
+.hero-pick[hidden] { display: none; }
+.hero-pick h2 { font-size: var(--step-lead); line-height: 1.2; }
+.hero-pick .pick-type { margin-top: 0.25rem; font-weight: 500; }
+.hero-pick .pick-facts { margin-top: 0.25rem; font-size: var(--step-small); color: var(--paper-muted); }
+.hero-pick .pick-actions { margin-top: 1rem; display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
+.hero-pick form { margin-top: 1.25rem; }
+.hero-pick .form-grid.three { grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; }
+.hero-pick .field { min-height: 2.6rem; padding: 0.4rem 0.6rem; }
+.hero-pick .pick-close { position: absolute; right: 1rem; top: 0.9rem; font-size: var(--step-small); text-decoration: underline; text-underline-offset: 0.18em; min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: flex-end; }
+.hero-stage canvas.is-over { cursor: pointer; }
+@media (max-width: 48em) {
+  .hero-ui { top: 5.5rem; }
+  .hero-caption { max-width: none; }
+  .hero-pick { top: auto; bottom: 0; right: 0; left: 0; width: auto; max-height: 70svh; overflow: auto; }
+}
+
+/* ---------- the flat in 3D: the scene on the left, a paper panel on the right ---------- */
+.flat-page main { padding-top: 0; }
+.flat { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 400px); min-height: 100svh; }
+.flat-stage { position: relative; min-height: 100svh; background: #dfe6ec; overflow: clip; touch-action: none; }
+.flat-stage canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; outline-offset: -3px; }
+.flat-labels { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.flat-labels span { position: absolute; left: 0; top: 0; font-size: var(--step-small); font-weight: 500; letter-spacing: 0.02em; color: #0c0a08; background: rgba(233, 231, 227, 0.85); padding: 0.15rem 0.5rem; white-space: nowrap; }
+.flat-labels span[hidden] { display: none; }
+.flat-dpad { position: absolute; z-index: 3; left: var(--margin); bottom: 1.5rem; display: grid; grid-template-columns: repeat(3, 56px); grid-template-rows: repeat(2, 56px); gap: 6px; }
+.flat-dpad[hidden] { display: none; }
+.flat-dpad button { background: rgba(12, 10, 8, 0.7); color: var(--ink); font-size: 1.5rem; min-width: 56px; min-height: 56px; touch-action: none; user-select: none; -webkit-user-select: none; }
+.flat-dpad button[data-key="w"] { grid-column: 2; grid-row: 1; }
+.flat-dpad button[data-key="a"] { grid-column: 1; grid-row: 2; }
+.flat-dpad button[data-key="s"] { grid-column: 2; grid-row: 2; }
+.flat-dpad button[data-key="d"] { grid-column: 3; grid-row: 2; }
+.flat-no3d { display: none; position: absolute; z-index: 2; inset: 0; padding: 7rem var(--margin) 2rem; color: #0c0a08; }
+.flat-stage.no-3d .flat-no3d { display: block; }
+.flat-panel { background: var(--paper); color: var(--paper-ink); padding: 6.5rem 2rem 3rem; max-height: 100svh; overflow: auto; }
+.flat-page .topbar { color: var(--ink); }
+.flat-page .topbar .topnav, .flat-page .brand { color: #0c0a08; }
+.flat-page .menu-toggle { color: var(--paper-ink); }
+.flat-links { font-size: var(--step-small); color: var(--paper-muted); }
+.flat-title { margin-top: 0.5rem; font-size: var(--step-head); line-height: 1.08; letter-spacing: -0.02em; }
+.flat-type { margin-top: 0.25rem; font-weight: 500; }
+.flat-facts { margin-top: 0.25rem; }
+.flat-views { margin-top: 1.5rem; display: flex; gap: 0.5rem; }
+.flat-views .button { flex: 1 1 0; }
+.flat-views .button[aria-pressed="false"] { background: var(--paper-2); color: var(--paper-ink); }
+.flat-help { margin-top: 0.75rem; }
+.flat-section { margin-top: 1.75rem; }
+.flat-section summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; font-size: var(--step-lead); line-height: 1.25; min-height: 44px; }
+.flat-section summary::-webkit-details-marker { display: none; }
+.flat-section summary::after { content: ""; flex: 0 0 auto; width: 10px; height: 10px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform var(--t-ui) var(--ease-out); margin-right: 4px; }
+.flat-section[open] summary::after { transform: rotate(225deg); }
+.flat-section > :not(summary) { margin-top: 0.75rem; }
+.flat-premium { font-size: var(--step-small); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; background: var(--accent); color: var(--accent-ink); padding: 0.1rem 0.45rem; margin-left: auto; }
+.flat-rooms li + li { margin-top: 0.1rem; }
+.flat-rooms button { text-align: left; min-height: 36px; text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 0.2em; transition: text-decoration-color var(--t-hover) var(--ease-out); }
+@media (hover: hover) and (pointer: fine) { .flat-rooms button:hover { text-decoration-color: currentColor; } }
+.flat-catalogue { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.flat-catalogue button { background: var(--paper-2); color: var(--paper-ink); padding: 0.5rem 0.8rem; min-height: 40px; transition: background-color var(--t-hover) var(--ease-out), color var(--t-hover) var(--ease-out); }
+@media (hover: hover) and (pointer: fine) { .flat-catalogue button:hover { background: var(--paper-ink); color: var(--paper); } }
+.flat-selected { background: var(--paper-2); padding: 1rem; }
+.flat-selected-actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
+.flat-selected-actions .button { flex: 1 1 0; min-height: 2.6rem; padding-inline: 0.8rem; }
+.flat-scan .label { margin-top: 0.75rem; }
+.flat-scan-status:empty { display: none; }
+.flat-scan-result { display: grid; grid-template-columns: 120px 1fr; gap: 1rem; align-items: start; }
+.flat-scan-result img { width: 120px; height: auto; background: var(--paper-2); }
+.flat-swatch { display: inline-block; width: 1em; height: 1em; vertical-align: -0.15em; margin-left: 0.3em; }
+.flat-pick .form-grid.three { grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; }
+.flat-foot { margin-top: 2.5rem; }
+@media (max-width: 60em) {
+  .flat { grid-template-columns: 1fr; }
+  .flat-stage { min-height: 62svh; height: 62svh; }
+  .flat-panel { max-height: none; padding: 1.5rem var(--margin) 3rem; }
+  .flat-page .topbar .topnav, .flat-page .brand, .flat-page .menu-toggle { color: #0c0a08; }
 }

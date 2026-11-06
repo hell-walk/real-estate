@@ -11,6 +11,7 @@ import { timingSafeEqual } from 'node:crypto';
 import { build } from './build.mjs';
 import { ROOT, SRC, OUT } from './lib/render.mjs';
 import * as api from './lib/api.mjs';
+import { scanItem } from './lib/scan.mjs';
 import * as pages from './lib/pages.mjs';
 
 const PORT = Number(process.env.PORT || 4321);
@@ -40,9 +41,9 @@ const json = (res, { status, body }) => send(res, status, JSON.stringify(body), 
 const redirect = (res, to) => { res.writeHead(303, { location: to }); res.end(); };
 const wantsJson = (req) => /application\/json/.test(req.headers.accept || '') || /application\/json/.test(req.headers['content-type'] || '');
 
-async function readBody(req) {
+async function readBody(req, limit = 64 * 1024) {
   const chunks = []; let size = 0;
-  for await (const c of req) { size += c.length; if (size > 64 * 1024) throw Object.assign(new Error('Body too large'), { status: 413 }); chunks.push(c); }
+  for await (const c of req) { size += c.length; if (size > limit) throw Object.assign(new Error('Body too large'), { status: 413 }); chunks.push(c); }
   const raw = Buffer.concat(chunks).toString('utf8');
   const type = req.headers['content-type'] || '';
   if (type.includes('application/json')) return raw ? JSON.parse(raw) : {};
@@ -106,6 +107,10 @@ async function route(req, res) {
     return json(res, b ? { status: 200, body: { ok: true, booking: api.publicBooking(b) } } : { status: 404, body: { ok: false, error: 'No booking with that reference.' } });
   }
   if ((m = /^\/api\/bookings\/(AR-\d{4})\/cancel$/i.exec(path)) && method === 'POST') return json(res, await api.cancelBooking(m[1], (await readBody(req)).last4));
+  if (path === '/api/scan' && method === 'POST') { // a picture of a piece of furniture, read by Claude (lib/scan.mjs)
+    if (limited(req)) return json(res, { status: 429, body: { ok: false, error: 'Too many requests from this address.' } });
+    return json(res, await scanItem(await readBody(req, 4 * 1024 * 1024)));
+  }
   if (path === '/api/enquiries' && method === 'POST') {
     if (limited(req)) return json(res, { status: 429, body: { ok: false, error: 'Too many requests from this address.' } });
     const input = await readBody(req);
@@ -163,6 +168,7 @@ createServer(async (req, res) => {
     send(res, err.status || 500, 'Something went wrong on the server.', TYPES['.txt']);
   }
 }).listen(PORT, () => {
-  console.log(`Aranya Estates on http://localhost:${PORT}`);
+  console.log(`Ratan Galaxy sample site on http://localhost:${PORT}`);
+  console.log(process.env.ANTHROPIC_API_KEY ? 'Scan a piece: on (ANTHROPIC_API_KEY is set)' : 'Scan a piece: off until ANTHROPIC_API_KEY is set');
   console.log(`Lounge desk at http://localhost:${PORT}/admin/  user "${ADMIN_USER}"  password "${process.env.ADMIN_PASSWORD ? '(from ADMIN_PASSWORD)' : ADMIN_PASSWORD}"`);
 });

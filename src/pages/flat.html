@@ -1,0 +1,79 @@
+<!-- page {"title": "A flat in 3D · Ratan Galaxy", "description": "Walk through a flat of Ratan Galaxy, Vrindavan Yojna, Lucknow, in three dimensions: look round the rooms, furnish them from a catalogue, or scan a piece you own and put it where it would go.", "nav": "flat", "path": "/flat.html", "bodyClass": "flat-page", "head": "<script type=\"importmap\">{\"imports\":{\"three\":\"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js\"}}</script>", "scripts": "<script type=\"module\" src=\"./js/flat3d.js\"></script>"} -->
+<section class="flat" aria-labelledby="flat-title">
+  <div class="flat-stage" id="flat-stage">
+    <div class="flat-labels" id="flat-labels" aria-hidden="true"></div>
+    <div class="flat-dpad" id="flat-dpad" hidden aria-label="Walk">
+      <button type="button" data-key="w" aria-label="Forward">↑</button>
+      <button type="button" data-key="a" aria-label="Left">←</button>
+      <button type="button" data-key="s" aria-label="Back">↓</button>
+      <button type="button" data-key="d" aria-label="Right">→</button>
+    </div>
+    <div class="flat-no3d">
+      <p>This page draws the flat in three dimensions in a browser with WebGL. Yours does not have it, so here is the plan instead.</p>
+      <p><a class="link-plain" href="./homes.html">The floor plans of every home</a></p>
+    </div>
+  </div>
+  <aside class="flat-panel paper" id="flat-panel">
+    <p class="flat-links"><a class="link-plain" data-block-link href="./towers/">Block A</a> · <a class="link-plain" href="./homes.html">all homes</a></p>
+    <h1 class="flat-title" id="flat-title" data-where>A flat in 3D</h1>
+    <p class="flat-type" data-type></p>
+    <p class="flat-facts small muted" data-facts></p>
+
+    <div class="flat-views" role="group" aria-label="View">
+      <button type="button" class="button ink" data-view="walk" aria-pressed="true">Walk through</button>
+      <button type="button" class="button ink" data-view="plan" aria-pressed="false">The plan</button>
+    </div>
+    <p class="flat-help small muted" data-help>Drag to look round. W A S D or the arrows walk you; doors only.</p>
+
+    <details class="flat-section" open>
+      <summary>Rooms</summary>
+      <ul class="flat-rooms" data-rooms></ul>
+    </details>
+
+    <details class="flat-section" open>
+      <summary>Furnish it</summary>
+      <p class="small muted">Tap a piece to put it in front of you, then drag it where it goes.</p>
+      <div class="flat-catalogue" data-catalogue></div>
+      <div class="flat-selected" data-selected hidden>
+        <p><strong data-selected-name>Piece</strong></p>
+        <div class="flat-selected-actions"><button type="button" class="button ink" data-rotate>Turn</button><button type="button" class="button ghost" data-remove>Take out</button></div>
+      </div>
+      <p class="small muted flat-count" data-count>Nothing in the flat yet.</p>
+      <p><button type="button" class="link-plain" data-clear>Empty the flat</button></p>
+    </details>
+
+    <details class="flat-section flat-scan">
+      <summary>Scan a piece of your own <span class="flat-premium">Premium</span></summary>
+      <p class="small muted">Photograph your sofa, your bed, your fridge. Claude reads the picture, works out its size and colour, and it goes into the flat at that size with the photograph on its front. On this sample site the scan runs only when the server has a Claude key.</p>
+      <label class="label" for="scan-file">The photograph</label>
+      <input class="field" id="scan-file" type="file" accept="image/jpeg,image/png,image/webp" data-scan-file>
+      <label class="label" for="scan-note">A word about it, if you like</label>
+      <input class="field" id="scan-note" type="text" maxlength="200" placeholder="three seat sofa, about six feet wide" data-scan-note>
+      <p><button type="button" class="button ink wide" data-scan-go>Read the picture</button></p>
+      <p class="small flat-scan-status" data-scan-status aria-live="polite"></p>
+      <div class="flat-scan-result" data-scan-result hidden>
+        <div>
+          <p><strong data-scan-name>Piece</strong> <span class="flat-swatch" data-scan-swatch aria-hidden="true"></span></p>
+          <p class="small muted" data-scan-size></p>
+          <p class="small muted" data-scan-note-out></p>
+          <p><button type="button" class="button ink" data-scan-place>Put it in the flat</button></p>
+        </div>
+      </div>
+    </details>
+
+    <details class="flat-section">
+      <summary>Another flat</summary>
+      <form class="flat-pick" data-pick-flat method="get" action="./flat.html">
+        <div class="form-grid three">
+          <div><label class="label" for="pf-block">Block</label><select class="field" id="pf-block" name="block"><option>A</option><option>B</option><option>C</option></select></div>
+          <div><label class="label" for="pf-floor">Floor</label><select class="field" id="pf-floor" name="floor"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option></select></div>
+          <div><label class="label" for="pf-flat">Flat</label><select class="field" id="pf-flat" name="flat"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option></select></div>
+        </div>
+        <p><button class="button ink wide" type="submit">Open it</button></p>
+      </form>
+      <p class="small muted">Blocks A and C: flats 1 and 8 are four bedroom, 3, 6, 10 and 13 three bedroom with a servant's room, 2, 7, 9 and 12 three bedroom, the rest two bedroom. Block B is all two bedroom. Where a flat sits on the floor is as we read the public plan.</p>
+    </details>
+
+    <p class="small muted flat-foot">A sample site. The rooms follow the builder's published plans; prices, people and anything else not on a plan are invented. Not affiliated with Ratan Housing Development Limited.</p>
+  </aside>
+</section>

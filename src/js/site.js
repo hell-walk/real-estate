@@ -1,4 +1,4 @@
-// Aranya Estates — page behaviour shared by every page: menu, reveals, the word-by-word statement,
+// Ratan Galaxy sample site — page behaviour shared by every page: menu, reveals, the word-by-word statement,
 // the EMI reader, the FAQ accordion and the booking form. No dependencies. Content never depends on it.
 (() => {
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
