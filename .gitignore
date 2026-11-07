@@ -5,3 +5,8 @@ node_modules/
 data/
 site/
 shots/
+
+blender/*.blend
+blender/*.blend1
+blender/hdri/
+blender/renders/

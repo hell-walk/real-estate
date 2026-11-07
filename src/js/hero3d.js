@@ -8,6 +8,9 @@
 // three and four bedroom homes. Materials are drawn on canvases here (plaster, grass, asphalt, paving, railings, the
 // gate board), reflections come from a room environment, and the sun casts shadows on screens that can afford them.
 // Three.js 0.170.0 from the CDN, a static picture when WebGL is missing. Sizes are metres read off the plan.
+// The plot inside the wall is drawn here first, then replaced by the model built in Blender (blender/build_site.py,
+// exported as assets/models/ratan-galaxy.glb with Draco) as soon as it arrives: the same plan, the same block positions,
+// one box per home with a _flat attribute and a colour attribute so a home can still be picked and painted.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -18,6 +21,8 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { VignetteShader } from 'three/addons/shaders/VignetteShader.js';
 import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { BLOCKS, PLANS, flatType, ordinal } from './plans.js';
 
 const hero = document.querySelector('.hero');
@@ -88,6 +93,7 @@ async function init() {
   const shadows = !phone;
 
   const scene = new THREE.Scene();
+  const plot = new THREE.Group(); scene.add(plot); // everything inside the wall, and the gate: drawn here, replaced by the Blender model when it loads
   const camera = new THREE.PerspectiveCamera(42, 1, 0.3, 1400);
   const dummy = new THREE.Object3D();
   const tmpColor = new THREE.Color();
@@ -143,9 +149,9 @@ async function init() {
   const ground = new THREE.Mesh(new THREE.PlaneGeometry(1600, 1600), new THREE.MeshStandardMaterial({ map: grassTex, roughness: 1 }));
   ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
   const paving = new THREE.Mesh(new THREE.PlaneGeometry(239, 69), new THREE.MeshStandardMaterial({ map: pavingTex, roughness: 1 }));
-  paving.rotation.x = -Math.PI / 2; paving.position.y = 0.06; paving.receiveShadow = true; scene.add(paving);
+  paving.rotation.x = -Math.PI / 2; paving.position.y = 0.06; paving.receiveShadow = true; plot.add(paving);
 
-  const flat = (geo, color, x, z, y = 0.1, rot = 0, extra = {}) => { const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color, roughness: 1, ...extra })); m.rotation.x = -Math.PI / 2; m.rotation.z = rot; m.position.set(x, y, z); m.receiveShadow = true; scene.add(m); return m; };
+  const flat = (geo, color, x, z, y = 0.1, rot = 0, extra = {}, parent = plot) => { const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color, roughness: 1, ...extra })); m.rotation.x = -Math.PI / 2; m.rotation.z = rot; m.position.set(x, y, z); m.receiveShadow = true; parent.add(m); return m; };
   [[-72, -24, 18, 9], [34, -24, 18, 9], [-72, 25, 18, 9], [34, 25, 18, 9], [-50, 2, 10, 20], [8, 2, 10, 20]].forEach(([x, z, w, h]) => flat(new THREE.PlaneGeometry(w, h), '#ffffff', x, z, 0.12, 0, { map: lawnTex }));
   const gardenTex = grassTex.clone(); gardenTex.repeat.set(10, 12); gardenTex.needsUpdate = true;
   flat(new THREE.PlaneGeometry(46, 60), '#f2f7ea', 95, 2, 0.1, 0, { map: gardenTex }); // the garden at the east end
@@ -153,15 +159,15 @@ async function init() {
   flat(new THREE.PlaneGeometry(20, 56), '#f2f7ea', -110, 0, 0.1, 0, { map: stripTex }); // and the strip at the west end
 
   // roads: the south road the gate opens on, and the ones down both sides
-  flat(new THREE.PlaneGeometry(300, 14), '#ffffff', 0, 43, 0.04, 0, { map: asphaltTex });
+  flat(new THREE.PlaneGeometry(300, 14), '#ffffff', 0, 43, 0.04, 0, { map: asphaltTex }, scene);
   const sideTex = asphaltTex.clone(); sideTex.repeat.set(2, 24); sideTex.needsUpdate = true;
-  flat(new THREE.PlaneGeometry(14, 160), '#ffffff', -129, 0, 0.04, 0, { map: sideTex });
-  flat(new THREE.PlaneGeometry(14, 160), '#ffffff', 129, 0, 0.04, 0, { map: sideTex });
+  flat(new THREE.PlaneGeometry(14, 160), '#ffffff', -129, 0, 0.04, 0, { map: sideTex }, scene);
+  flat(new THREE.PlaneGeometry(14, 160), '#ffffff', 129, 0, 0.04, 0, { map: sideTex }, scene);
   const dashes = new THREE.InstancedMesh(new THREE.PlaneGeometry(3, 0.2), new THREE.MeshStandardMaterial({ color: '#d8c35e', roughness: 1 }), 50);
   for (let i = 0; i < 50; i++) { dummy.position.set(-147 + i * 6, 0.05, 43); dummy.rotation.set(-Math.PI / 2, 0, 0); dummy.scale.set(1, 1, 1); dummy.updateMatrix(); dashes.setMatrixAt(i, dummy.matrix); }
   scene.add(dashes);
-  flat(new THREE.PlaneGeometry(300, 3), '#b9b3a9', 0, 51.5, 0.05); // the footpath across the road
-  flat(new THREE.PlaneGeometry(300, 0.3), '#8a8580', 0, 50, 0.06); // its kerb
+  flat(new THREE.PlaneGeometry(300, 3), '#b9b3a9', 0, 51.5, 0.05, 0, {}, scene); // the footpath across the road
+  flat(new THREE.PlaneGeometry(300, 0.3), '#8a8580', 0, 50, 0.06, 0, {}, scene); // its kerb
   flat(new THREE.PlaneGeometry(240, 2.5), '#b9b3a9', 0, 34.5, 0.07); // and the one along the wall
 
   // the parking row inside the south wall, white lines and a few cars
@@ -169,7 +175,7 @@ async function init() {
   flat(new THREE.PlaneGeometry(222, 7), '#a9a5a2', 0, 29.5, 0.08, 0, { map: parkTex });
   const lines = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.12, 5), new THREE.MeshStandardMaterial({ color: '#e8e4dc', roughness: 1 }), 90);
   for (let i = 0; i < 90; i++) { dummy.position.set(-110 + i * 2.5, 0.09, 29.5); dummy.rotation.set(-Math.PI / 2, 0, 0); dummy.scale.set(1, 1, 1); dummy.updateMatrix(); lines.setMatrixAt(i, dummy.matrix); }
-  scene.add(lines);
+  plot.add(lines);
   const carBody = new THREE.InstancedMesh(new THREE.BoxGeometry(1.7, 0.7, 4.2), new THREE.MeshStandardMaterial({ roughness: 0.25, metalness: 0.6 }), 34);
   const carCab = new THREE.InstancedMesh(new THREE.BoxGeometry(1.5, 0.6, 2.2), new THREE.MeshStandardMaterial({ color: '#2a3036', roughness: 0.1, metalness: 0.7 }), 34);
   const carColours = ['#d9d6d0', '#2b2b2e', '#8f8f93', '#7a2c2a', '#2c3e6b', '#e9e5dc', '#4a4a4c', '#b8b2a5'];
@@ -178,15 +184,15 @@ async function init() {
     dummy.position.set(x, 0.55, 29.5); dummy.rotation.set(0, 0, 0); dummy.scale.set(1, 1, 1); dummy.updateMatrix(); carBody.setMatrixAt(i, dummy.matrix); carBody.setColorAt(i, tmpColor.set(carColours[i % carColours.length]));
     dummy.position.set(x, 1.2, 29.3); dummy.updateMatrix(); carCab.setMatrixAt(i, dummy.matrix);
   }
-  carBody.castShadow = carCab.castShadow = shadows; scene.add(carBody, carCab);
+  carBody.castShadow = carCab.castShadow = shadows; plot.add(carBody, carCab);
 
   // the boundary wall with its piers and the grille on top, the gate with its board, the gatehouse
   const wallMat = new THREE.MeshStandardMaterial({ map: wallTex, roughness: 0.95 });
-  const wallPiece = (w, d, x, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, 2.2, d), wallMat); m.position.set(x, 1.1, z); m.castShadow = shadows; m.receiveShadow = true; scene.add(m); };
+  const wallPiece = (w, d, x, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, 2.2, d), wallMat); m.position.set(x, 1.1, z); m.castShadow = shadows; m.receiveShadow = true; plot.add(m); };
   wallPiece(240, 0.4, 0, -35); wallPiece(0.4, 70, -120, 0); wallPiece(0.4, 70, 120, 0);
   wallPiece(124, 0.4, -58, 35); wallPiece(100, 0.4, 70, 35); // the gap from 4 to 20 is the gate
   const grilleMat = new THREE.MeshStandardMaterial({ map: grilleTex, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.6, metalness: 0.4 });
-  const grille = (w, x, z, rot) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, 0.8), grilleMat); m.position.set(x, 2.6, z); m.rotation.y = rot; scene.add(m); };
+  const grille = (w, x, z, rot) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, 0.8), grilleMat); m.position.set(x, 2.6, z); m.rotation.y = rot; plot.add(m); };
   grille(240, 0, -35, 0); grille(70, -120, 0, Math.PI / 2); grille(70, 120, 0, Math.PI / 2); grille(124, -58, 35, 0); grille(100, 70, 35, 0);
   const pierMat = new THREE.MeshStandardMaterial({ color: '#c9bca6', roughness: 0.95 });
   const piers = new THREE.InstancedMesh(new THREE.BoxGeometry(0.7, 2.6, 0.7), pierMat, 70);
@@ -194,56 +200,60 @@ async function init() {
   const pier = (x, z) => { dummy.position.set(x, 1.3, z); dummy.rotation.set(0, 0, 0); dummy.scale.set(1, 1, 1); dummy.updateMatrix(); piers.setMatrixAt(pc++, dummy.matrix); };
   for (let x = -120; x <= 120; x += 12) { pier(x, -35); if (x < 2 || x > 22) pier(x, 35); }
   for (let z = -23; z <= 23; z += 12) { pier(-120, z); pier(120, z); }
-  piers.count = pc; piers.castShadow = shadows; scene.add(piers);
+  piers.count = pc; piers.castShadow = shadows; plot.add(piers);
   const pillarMat = new THREE.MeshStandardMaterial({ color: '#f3f0ea', roughness: 0.9 }); // the gate, the canopies and the gatehouse roof are white plaster, as in the photographs
-  const gateParts = [];
-  [[4.5, 35], [19.5, 35]].forEach(([x, z]) => { const p = new THREE.Mesh(new THREE.BoxGeometry(1.4, 5, 1.4), pillarMat); p.position.set(x, 2.5, z); p.castShadow = shadows; scene.add(p); gateParts.push(p); });
-  const gateBeam = new THREE.Mesh(new THREE.BoxGeometry(16.4, 0.5, 1.4), pillarMat); gateBeam.position.set(12, 5.3, 35); gateBeam.castShadow = shadows; scene.add(gateBeam);
-  const gateCornice = new THREE.Mesh(new THREE.BoxGeometry(17.6, 0.3, 2.2), pillarMat); gateCornice.position.set(12, 5.7, 35); gateCornice.castShadow = shadows; scene.add(gateCornice); // the moulded cornice over the gate
+  let gateParts = []; // what a click on walks you in; the Blender model's gate_* meshes once it loads
+  [[4.5, 35], [19.5, 35]].forEach(([x, z]) => { const p = new THREE.Mesh(new THREE.BoxGeometry(1.4, 5, 1.4), pillarMat); p.position.set(x, 2.5, z); p.castShadow = shadows; plot.add(p); gateParts.push(p); });
+  const gateBeam = new THREE.Mesh(new THREE.BoxGeometry(16.4, 0.5, 1.4), pillarMat); gateBeam.position.set(12, 5.3, 35); gateBeam.castShadow = shadows; plot.add(gateBeam);
+  const gateCornice = new THREE.Mesh(new THREE.BoxGeometry(17.6, 0.3, 2.2), pillarMat); gateCornice.position.set(12, 5.7, 35); gateCornice.castShadow = shadows; plot.add(gateCornice); // the moulded cornice over the gate
   const boardSide = new THREE.MeshStandardMaterial({ color: '#1b1613' }), boardFace = new THREE.MeshStandardMaterial({ map: boardTex, roughness: 0.6 });
   const board = new THREE.Mesh(new THREE.BoxGeometry(11, 2.4, 0.3), [boardSide, boardSide, boardSide, boardSide, boardFace, boardFace]);
-  board.position.set(12, 7.1, 35); board.castShadow = shadows; scene.add(board);
+  board.position.set(12, 7.1, 35); board.castShadow = shadows; plot.add(board);
   gateParts.push(gateBeam, gateCornice, board);
   const leafTex = grilleTex.clone(); leafTex.repeat.set(7, 3); leafTex.needsUpdate = true;
   const gateLeaf = new THREE.Mesh(new THREE.PlaneGeometry(7, 2.4), new THREE.MeshStandardMaterial({ map: leafTex, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.6, metalness: 0.4 }));
-  gateLeaf.position.set(5.2 + 3.5 * Math.cos(1.2), 1.4, 35 - 3.5 * Math.sin(1.2)); gateLeaf.rotation.y = -1.2; scene.add(gateLeaf); // one leaf, standing open
-  const gatehouse = new THREE.Mesh(new THREE.BoxGeometry(5, 3.2, 3.5), new THREE.MeshStandardMaterial({ map: plasterTex, roughness: 0.9 })); gatehouse.position.set(24, 1.6, 32.5); gatehouse.castShadow = shadows; scene.add(gatehouse);
-  const gatehouseRoof = new THREE.Mesh(new THREE.BoxGeometry(6, 0.3, 4.5), pillarMat); gatehouseRoof.position.set(24, 3.35, 32.5); scene.add(gatehouseRoof);
+  gateLeaf.position.set(5.2 + 3.5 * Math.cos(1.2), 1.4, 35 - 3.5 * Math.sin(1.2)); gateLeaf.rotation.y = -1.2; plot.add(gateLeaf); // one leaf, standing open
+  const gatehouse = new THREE.Mesh(new THREE.BoxGeometry(5, 3.2, 3.5), new THREE.MeshStandardMaterial({ map: plasterTex, roughness: 0.9 })); gatehouse.position.set(24, 1.6, 32.5); gatehouse.castShadow = shadows; plot.add(gatehouse);
+  const gatehouseRoof = new THREE.Mesh(new THREE.BoxGeometry(6, 0.3, 4.5), pillarMat); gatehouseRoof.position.set(24, 3.35, 32.5); plot.add(gatehouseRoof);
   const driveTex = pavingTex.clone(); driveTex.repeat.set(5, 3); driveTex.needsUpdate = true;
   flat(new THREE.PlaneGeometry(16, 10), '#9a9591', 12, 31, 0.1, 0, { map: driveTex }); // the drive in
 
   // courts, the pool, the kids' pool, the sand pit, the club and its amphitheatre, the gazebo
   const court = (x, z, w, h, color) => { flat(new THREE.PlaneGeometry(w, h), color, x, z, 0.14, 0, { roughness: 0.85 }); flat(new THREE.PlaneGeometry(w - 1, 0.12), '#f1ede5', x, z, 0.18); flat(new THREE.PlaneGeometry(0.12, h - 1), '#f1ede5', x - w / 2 + 0.5, z, 0.18); flat(new THREE.PlaneGeometry(0.12, h - 1), '#f1ede5', x + w / 2 - 0.5, z, 0.18); };
   court(-109, -22, 16, 9, '#4f8a46'); court(-109, 26, 14, 8, '#c0683f'); court(110, -20, 16, 9, '#c0683f');
-  const waterMat = new THREE.MeshStandardMaterial({ color: '#3f9bb4', roughness: 0.05, metalness: 0.55, envMapIntensity: 1.2 });
+  let waterMat = new THREE.MeshStandardMaterial({ color: '#3f9bb4', roughness: 0.05, metalness: 0.55, envMapIntensity: 1.2 });
   flat(new THREE.PlaneGeometry(24, 15), '#ffffff', 86, -15, 0.13, 0, { map: deckTex }); // the pool deck
-  const pool = new THREE.Mesh(new THREE.CircleGeometry(1, 40), waterMat); pool.rotation.x = -Math.PI / 2; pool.scale.set(9, 5, 1); pool.position.set(86, 0.2, -16); scene.add(pool);
-  const kidsPool = new THREE.Mesh(new THREE.CircleGeometry(3, 24), waterMat); kidsPool.rotation.x = -Math.PI / 2; kidsPool.position.set(96, 0.2, -8); scene.add(kidsPool);
-  const sand = new THREE.Mesh(new THREE.CircleGeometry(6, 24), new THREE.MeshStandardMaterial({ color: '#dcc99b', roughness: 1 })); sand.rotation.x = -Math.PI / 2; sand.position.set(86, 0.16, 3); scene.add(sand);
+  const pool = new THREE.Mesh(new THREE.CircleGeometry(1, 40), waterMat); pool.rotation.x = -Math.PI / 2; pool.scale.set(9, 5, 1); pool.position.set(86, 0.2, -16); plot.add(pool);
+  const kidsPool = new THREE.Mesh(new THREE.CircleGeometry(3, 24), waterMat); kidsPool.rotation.x = -Math.PI / 2; kidsPool.position.set(96, 0.2, -8); plot.add(kidsPool);
+  const sand = new THREE.Mesh(new THREE.CircleGeometry(6, 24), new THREE.MeshStandardMaterial({ color: '#dcc99b', roughness: 1 })); sand.rotation.x = -Math.PI / 2; sand.position.set(86, 0.16, 3); plot.add(sand);
   const clubMat = new THREE.MeshStandardMaterial({ map: plasterTex, roughness: 0.9 });
-  const club = new THREE.Mesh(new THREE.CylinderGeometry(9, 9, 7, 36), clubMat); club.position.set(104, 3.5, 10); club.castShadow = shadows; club.receiveShadow = true; scene.add(club);
-  const clubGlass = new THREE.Mesh(new THREE.CylinderGeometry(9.05, 9.05, 2.2, 36, 1, true), new THREE.MeshStandardMaterial({ color: '#8fb0c8', roughness: 0.15, metalness: 0.6, side: THREE.DoubleSide })); clubGlass.position.set(104, 4.2, 10); scene.add(clubGlass);
-  const clubRoof = new THREE.Mesh(new THREE.CylinderGeometry(9.8, 9.8, 0.5, 36), pillarMat); clubRoof.position.set(104, 7.25, 10); clubRoof.castShadow = shadows; scene.add(clubRoof);
-  for (let s = 0; s < 3; s++) { const step = new THREE.Mesh(new THREE.CylinderGeometry(11 + s * 1.6, 11 + s * 1.6, 0.4, 36), new THREE.MeshStandardMaterial({ color: s % 2 ? '#c9bda8' : '#d8cdb8', roughness: 1 })); step.position.set(104, 0.2 + (2 - s) * 0.4, 10); step.receiveShadow = true; scene.add(step); }
-  const gazebo = new THREE.Mesh(new THREE.ConeGeometry(3, 1.6, 8), pillarMat); gazebo.position.set(92, 3.9, 22); gazebo.castShadow = shadows; scene.add(gazebo);
-  for (let i = 0; i < 6; i++) { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 3, 6), clubMat); p.position.set(92 + Math.cos((i / 6) * 6.283) * 2.2, 1.5, 22 + Math.sin((i / 6) * 6.283) * 2.2); scene.add(p); }
+  const club = new THREE.Mesh(new THREE.CylinderGeometry(9, 9, 7, 36), clubMat); club.position.set(104, 3.5, 10); club.castShadow = shadows; club.receiveShadow = true; plot.add(club);
+  const clubGlass = new THREE.Mesh(new THREE.CylinderGeometry(9.05, 9.05, 2.2, 36, 1, true), new THREE.MeshStandardMaterial({ color: '#8fb0c8', roughness: 0.15, metalness: 0.6, side: THREE.DoubleSide })); clubGlass.position.set(104, 4.2, 10); plot.add(clubGlass);
+  const clubRoof = new THREE.Mesh(new THREE.CylinderGeometry(9.8, 9.8, 0.5, 36), pillarMat); clubRoof.position.set(104, 7.25, 10); clubRoof.castShadow = shadows; plot.add(clubRoof);
+  for (let s = 0; s < 3; s++) { const step = new THREE.Mesh(new THREE.CylinderGeometry(11 + s * 1.6, 11 + s * 1.6, 0.4, 36), new THREE.MeshStandardMaterial({ color: s % 2 ? '#c9bda8' : '#d8cdb8', roughness: 1 })); step.position.set(104, 0.2 + (2 - s) * 0.4, 10); step.receiveShadow = true; plot.add(step); }
+  const gazebo = new THREE.Mesh(new THREE.ConeGeometry(3, 1.6, 8), pillarMat); gazebo.position.set(92, 3.9, 22); gazebo.castShadow = shadows; plot.add(gazebo);
+  for (let i = 0; i < 6; i++) { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 3, 6), clubMat); p.position.set(92 + Math.cos((i / 6) * 6.283) * 2.2, 1.5, 22 + Math.sin((i / 6) * 6.283) * 2.2); plot.add(p); }
   flat(new THREE.PlaneGeometry(2.2, 70), '#9b9793', 70, 0, 0.11); // the path between Block A and the garden
   flat(new THREE.PlaneGeometry(1.8, 44), '#9b9793', 92, -4, 0.12);
   const benchMat = new THREE.MeshStandardMaterial({ color: '#6b4a32', roughness: 0.9 });
-  [[80, 12], [100, -4], [112, 24], [-104, 4], [-112, -4], [60, -26]].forEach(([x, z]) => { const b = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.1, 0.5), benchMat); b.position.set(x, 0.55, z); b.castShadow = shadows; scene.add(b); const l = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.45, 0.08), benchMat); l.position.set(x, 0.3, z - 0.2); scene.add(l); });
+  [[80, 12], [100, -4], [112, 24], [-104, 4], [-112, -4], [60, -26]].forEach(([x, z]) => { const b = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.1, 0.5), benchMat); b.position.set(x, 0.55, z); b.castShadow = shadows; plot.add(b); const l = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.45, 0.08), benchMat); l.position.set(x, 0.3, z - 0.2); plot.add(l); });
 
   // lamps along the road and inside the wall: a post, and a head that glows when the light goes
   const lampMat = new THREE.MeshStandardMaterial({ color: '#3a3a3c', roughness: 0.6, metalness: 0.5 });
-  const lampGlow = new THREE.MeshStandardMaterial({ color: '#fff4dc', emissive: '#ffd27a', emissiveIntensity: 0, roughness: 0.4 });
-  const lampSpots = [];
-  for (let x = -140; x <= 140; x += 20) lampSpots.push([x, 50.5]);
-  for (let x = -112; x <= 112; x += 24) lampSpots.push([x, 33.2]);
-  for (let z = -30; z <= 30; z += 20) { lampSpots.push([-118.6, z]); lampSpots.push([118.6, z]); }
-  [[70, -28], [70, 28], [94, -26], [112, 2], [-104, 12], [-104, -12]].forEach((p) => lampSpots.push(p));
-  const posts = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.07, 0.1, 6, 6), lampMat, lampSpots.length);
-  const heads = new THREE.InstancedMesh(new THREE.SphereGeometry(0.32, 10, 8), lampGlow, lampSpots.length);
-  lampSpots.forEach(([x, z], i) => { dummy.position.set(x, 3, z); dummy.rotation.set(0, 0, 0); dummy.scale.set(1, 1, 1); dummy.updateMatrix(); posts.setMatrixAt(i, dummy.matrix); dummy.position.set(x, 6.1, z); dummy.updateMatrix(); heads.setMatrixAt(i, dummy.matrix); });
-  posts.castShadow = shadows; scene.add(posts, heads);
+  let lampGlow = new THREE.MeshStandardMaterial({ color: '#fff4dc', emissive: '#ffd27a', emissiveIntensity: 0, roughness: 0.4 });
+  const roadLampGlow = lampGlow; // the road's lamps stay drawn here when the Blender model takes over the plot's
+  const roadLamps = [], plotLamps = [];
+  for (let x = -140; x <= 140; x += 20) roadLamps.push([x, 50.5]);
+  for (let x = -112; x <= 112; x += 24) plotLamps.push([x, 33.2]);
+  for (let z = -30; z <= 30; z += 20) { plotLamps.push([-118.6, z]); plotLamps.push([118.6, z]); }
+  [[70, -28], [70, 28], [94, -26], [112, 2], [-104, 12], [-104, -12]].forEach((p) => plotLamps.push(p));
+  const lampRow = (spots, parent) => {
+    const posts = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.07, 0.1, 6, 6), lampMat, spots.length);
+    const heads = new THREE.InstancedMesh(new THREE.SphereGeometry(0.32, 10, 8), lampGlow, spots.length);
+    spots.forEach(([x, z], i) => { dummy.position.set(x, 3, z); dummy.rotation.set(0, 0, 0); dummy.scale.set(1, 1, 1); dummy.updateMatrix(); posts.setMatrixAt(i, dummy.matrix); dummy.position.set(x, 6.1, z); dummy.updateMatrix(); heads.setMatrixAt(i, dummy.matrix); });
+    posts.castShadow = shadows; parent.add(posts, heads);
+  };
+  lampRow(roadLamps, scene); lampRow(plotLamps, plot);
 
   loader.set(52, 'Raising the three blocks'); await frame();
   // ---------- the three blocks ----------
@@ -254,9 +264,9 @@ async function init() {
   const railMat = new THREE.MeshStandardMaterial({ map: railTex, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.6, metalness: 0.4 });
   const frameMat = new THREE.MeshStandardMaterial({ color: '#2f2d2b', roughness: 0.7 });
   const acMat = new THREE.MeshStandardMaterial({ color: '#d9d9d6', roughness: 0.7, metalness: 0.2 });
-  const glass = new THREE.MeshStandardMaterial({ color: '#a9c0d2', emissive: '#ffb860', emissiveIntensity: 0, roughness: 0.12, metalness: 0.65, envMapIntensity: 1.1 });
+  let glass = new THREE.MeshStandardMaterial({ color: '#a9c0d2', emissive: '#ffb860', emissiveIntensity: 0, roughness: 0.12, metalness: 0.65, envMapIntensity: 1.1 });
   const blockPos = { C: [-78, 2], B: [-19, 1], A: [40, 2] };
-  const records = []; // one per box, in instance order
+  let records = []; // one per box, in instance order; the Blender model's list once it loads
   const solids = []; // what you cannot walk through: ground floor footprints, in each one's own frame
   const flatMatrices = [], flatColours = [], slabMatrices = [], winMatrices = [], balcMatrices = [], railMatrices = [], acMatrices = [], bandMatrices = [];
   const cream = new THREE.Color('#f2efe9'), creamB = new THREE.Color('#ebe8e1'), shopC = new THREE.Color('#7f94a6'), under = new THREE.Color('#6a615a'), lobbyC = new THREE.Color('#56657a');
@@ -296,32 +306,32 @@ async function init() {
     });
     // the core with the lifts, the machine room and the tanks on the roof, the plinth under B and C
     const coreW = block.shape === 'x' ? 15 : 12, coreD = block.shape === 'x' ? 15 : 14;
-    const core = new THREE.Mesh(new THREE.BoxGeometry(coreW, top + 1.2, coreD), coreMat); core.position.set(bx, (top + 1.2) / 2, bz); core.castShadow = shadows; core.receiveShadow = true; scene.add(core);
+    const core = new THREE.Mesh(new THREE.BoxGeometry(coreW, top + 1.2, coreD), coreMat); core.position.set(bx, (top + 1.2) / 2, bz); core.castShadow = shadows; core.receiveShadow = true; plot.add(core);
     solids.push({ x: bx, z: bz, rot: 0, hl: coreW / 2 + 0.8, hw: coreD / 2 + 0.8 });
-    const machine = new THREE.Mesh(new THREE.BoxGeometry(6, 3, 5), coreMat); machine.position.set(bx + 3, top + 2.7, bz - 3); machine.castShadow = shadows; scene.add(machine);
-    for (const [tx, tz] of [[-4, 3], [-1, 3]]) { const tank = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, 1.6, 12), new THREE.MeshStandardMaterial({ color: '#2b2b2b', roughness: 0.8 })); tank.position.set(bx + tx, top + 2, bz + tz); scene.add(tank); }
-    if (base > 0) { const plinth = new THREE.Mesh(new THREE.BoxGeometry(block.shape === 'x' ? 70 : 40, base, block.shape === 'x' ? 70 : 56), new THREE.MeshStandardMaterial({ map: plinthTex, roughness: 1 })); plinth.position.set(bx, base / 2, bz); plinth.receiveShadow = true; scene.add(plinth); }
+    const machine = new THREE.Mesh(new THREE.BoxGeometry(6, 3, 5), coreMat); machine.position.set(bx + 3, top + 2.7, bz - 3); machine.castShadow = shadows; plot.add(machine);
+    for (const [tx, tz] of [[-4, 3], [-1, 3]]) { const tank = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, 1.6, 12), new THREE.MeshStandardMaterial({ color: '#2b2b2b', roughness: 0.8 })); tank.position.set(bx + tx, top + 2, bz + tz); plot.add(tank); }
+    if (base > 0) { const plinth = new THREE.Mesh(new THREE.BoxGeometry(block.shape === 'x' ? 70 : 40, base, block.shape === 'x' ? 70 : 56), new THREE.MeshStandardMaterial({ map: plinthTex, roughness: 1 })); plinth.position.set(bx, base / 2, bz); plinth.receiveShadow = true; plot.add(plinth); }
     // a canopy over the entrance on the south side
-    const canopy = new THREE.Mesh(new THREE.BoxGeometry(9, 0.3, 5), pillarMat); canopy.position.set(bx, base + 3.3, bz + coreD / 2 + 2.5 + (block.shape === 'x' ? 2 : 0)); canopy.castShadow = shadows; scene.add(canopy);
+    const canopy = new THREE.Mesh(new THREE.BoxGeometry(9, 0.3, 5), pillarMat); canopy.position.set(bx, base + 3.3, bz + coreD / 2 + 2.5 + (block.shape === 'x' ? 2 : 0)); canopy.castShadow = shadows; plot.add(canopy);
   }
   const flats = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), facadeMat, flatMatrices.length);
   flatMatrices.forEach((m, i) => { flats.setMatrixAt(i, m); flats.setColorAt(i, flatColours[i]); });
-  flats.castShadow = shadows; flats.receiveShadow = true; scene.add(flats);
+  flats.castShadow = shadows; flats.receiveShadow = true; plot.add(flats);
   const slabs = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), slabMat, slabMatrices.length);
-  slabMatrices.forEach((m, i) => slabs.setMatrixAt(i, m)); slabs.castShadow = shadows; scene.add(slabs);
+  slabMatrices.forEach((m, i) => slabs.setMatrixAt(i, m)); slabs.castShadow = shadows; plot.add(slabs);
   const windows = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1), glass, winMatrices.length);
-  winMatrices.forEach((m, i) => windows.setMatrixAt(i, m)); scene.add(windows);
+  winMatrices.forEach((m, i) => windows.setMatrixAt(i, m)); plot.add(windows);
   const frameGeo = new THREE.PlaneGeometry(1.14, 1.14); frameGeo.translate(0, 0, -0.012);
   const frames = new THREE.InstancedMesh(frameGeo, frameMat, winMatrices.length);
-  winMatrices.forEach((m, i) => frames.setMatrixAt(i, m)); scene.add(frames);
+  winMatrices.forEach((m, i) => frames.setMatrixAt(i, m)); plot.add(frames);
   const balconies = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), balconyMat, balcMatrices.length);
-  balcMatrices.forEach((m, i) => balconies.setMatrixAt(i, m)); balconies.castShadow = shadows; scene.add(balconies);
+  balcMatrices.forEach((m, i) => balconies.setMatrixAt(i, m)); balconies.castShadow = shadows; plot.add(balconies);
   const bands = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), coreMat, bandMatrices.length);
-  bandMatrices.forEach((m, i) => bands.setMatrixAt(i, m)); bands.castShadow = shadows; scene.add(bands);
+  bandMatrices.forEach((m, i) => bands.setMatrixAt(i, m)); bands.castShadow = shadows; plot.add(bands);
   const rails = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1), railMat, railMatrices.length);
-  railMatrices.forEach((m, i) => rails.setMatrixAt(i, m)); scene.add(rails);
+  railMatrices.forEach((m, i) => rails.setMatrixAt(i, m)); plot.add(rails);
   const acs = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), acMat, acMatrices.length);
-  acMatrices.forEach((m, i) => acs.setMatrixAt(i, m)); scene.add(acs);
+  acMatrices.forEach((m, i) => acs.setMatrixAt(i, m)); plot.add(acs);
 
   loader.set(72, 'Planting the palms and the trees'); await frame();
   // ---------- trees: palms along the parking row, round trees in the lawns and the garden, more outside ----------
@@ -335,14 +345,10 @@ async function init() {
     dummy.position.set(x, 3.5, z); dummy.rotation.set(lean, 0, lean); dummy.scale.set(1, 1, 1); dummy.updateMatrix(); palmTrunk.setMatrixAt(i, dummy.matrix);
     for (let f = 0; f < 8; f++) { dummy.position.set(x, 7, z); dummy.rotation.order = 'YXZ'; dummy.rotation.set(0, (f / 8) * 6.283 + rnd() * 0.4, -0.55 - rnd() * 0.35); dummy.updateMatrix(); fronds.setMatrixAt(i * 8 + f, dummy.matrix); dummy.rotation.order = 'XYZ'; }
   }
-  palmTrunk.castShadow = fronds.castShadow = shadows; scene.add(palmTrunk, fronds);
+  palmTrunk.castShadow = fronds.castShadow = shadows; plot.add(palmTrunk, fronds);
   const TREES = phone ? 260 : 520;
   const canopyGeo = new THREE.IcosahedronGeometry(2.4, 2);
   { const p = canopyGeo.attributes.position; for (let i = 0; i < p.count; i++) { const s = 0.86 + rnd() * 0.28; p.setXYZ(i, p.getX(i) * s, p.getY(i) * s * 0.9, p.getZ(i) * s); } canopyGeo.computeVertexNormals(); }
-  const crown = new THREE.InstancedMesh(canopyGeo, new THREE.MeshStandardMaterial({ roughness: 1 }), TREES);
-  const crown2 = new THREE.InstancedMesh(canopyGeo, new THREE.MeshStandardMaterial({ roughness: 1 }), TREES);
-  const trunk = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.2, 0.32, 2.6, 6), trunkMat, TREES);
-  let t = 0;
   const greens = ['#467f38', '#5f9440', '#3f7a35', '#6a9a46', '#527f33'];
   const insidePlot = (x, z) => Math.abs(x) < 121 && Math.abs(z) < 36;
   const nearBlock = (x, z) => Object.values(blockPos).some(([bx, bz]) => Math.abs(x - bx) < 36 && Math.abs(z - bz) < 30);
@@ -359,15 +365,20 @@ async function init() {
     if (insidePlot(x, z) || (Math.abs(z - 43) < 9 && Math.abs(x) < 160) || (Math.abs(Math.abs(x) - 129) < 9 && Math.abs(z) < 85)) continue;
     spots.push([x, z, 0.9 + rnd() * 1.1]);
   }
-  spots.forEach(([x, z, s]) => {
-    dummy.position.set(x, 1.3 * s, z); dummy.scale.set(s, s, s); dummy.rotation.set(0, 0, 0); dummy.updateMatrix(); trunk.setMatrixAt(t, dummy.matrix);
-    dummy.position.set(x, 4.2 * s, z); dummy.rotation.set(0, rnd() * 6, 0); dummy.updateMatrix(); crown.setMatrixAt(t, dummy.matrix); crown.setColorAt(t, tmpColor.set(greens[Math.floor(rnd() * greens.length)]));
-    dummy.position.set(x + (rnd() - 0.5) * 1.2 * s, 5.4 * s, z + (rnd() - 0.5) * 1.2 * s); dummy.scale.set(s * 0.7, s * 0.7, s * 0.7); dummy.rotation.set(0, rnd() * 6, 0); dummy.updateMatrix(); crown2.setMatrixAt(t, dummy.matrix); crown2.setColorAt(t, tmpColor.set(greens[Math.floor(rnd() * greens.length)]).offsetHSL(0, 0, 0.05));
-    t++;
-  });
-  crown.count = crown2.count = trunk.count = t;
-  crown.castShadow = crown2.castShadow = shadows; scene.add(crown, crown2, trunk);
-  spots.slice(0, phone ? 60 : 110).forEach(([x, z]) => solids.push({ x, z, rot: 0, hl: 0.5, hw: 0.5 }));
+  const forest = (list, parent) => { // the plot's trees go with the plot, the country's stay
+    const crown = new THREE.InstancedMesh(canopyGeo, new THREE.MeshStandardMaterial({ roughness: 1 }), list.length);
+    const crown2 = new THREE.InstancedMesh(canopyGeo, new THREE.MeshStandardMaterial({ roughness: 1 }), list.length);
+    const trunk = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.2, 0.32, 2.6, 6), trunkMat, list.length);
+    list.forEach(([x, z, s], t) => {
+      dummy.position.set(x, 1.3 * s, z); dummy.scale.set(s, s, s); dummy.rotation.set(0, 0, 0); dummy.updateMatrix(); trunk.setMatrixAt(t, dummy.matrix);
+      dummy.position.set(x, 4.2 * s, z); dummy.rotation.set(0, rnd() * 6, 0); dummy.updateMatrix(); crown.setMatrixAt(t, dummy.matrix); crown.setColorAt(t, tmpColor.set(greens[Math.floor(rnd() * greens.length)]));
+      dummy.position.set(x + (rnd() - 0.5) * 1.2 * s, 5.4 * s, z + (rnd() - 0.5) * 1.2 * s); dummy.scale.set(s * 0.7, s * 0.7, s * 0.7); dummy.rotation.set(0, rnd() * 6, 0); dummy.updateMatrix(); crown2.setMatrixAt(t, dummy.matrix); crown2.setColorAt(t, tmpColor.set(greens[Math.floor(rnd() * greens.length)]).offsetHSL(0, 0, 0.05));
+    });
+    crown.castShadow = crown2.castShadow = shadows; parent.add(crown, crown2, trunk);
+  };
+  const inside = phone ? 60 : 110;
+  forest(spots.slice(0, inside), plot); forest(spots.slice(inside), scene);
+  spots.slice(0, inside).forEach(([x, z]) => solids.push({ x, z, rot: 0, hl: 0.5, hw: 0.5 }));
 
   // ---------- the neighbourhood: low blocks across the roads, so the towers stand in a city ----------
   const NB = phone ? 70 : 140;
@@ -426,7 +437,7 @@ async function init() {
     cloudMat.color.setHex(0xfff8ee).lerp(new THREE.Color('#e08a62'), u);
     const on = THREE.MathUtils.smoothstep(u, 0.45, 0.92);
     glass.emissiveIntensity = on * 2.4; glass.color.setHex(on > 0.2 ? 0xffe6b8 : 0xa9c0d2);
-    lampGlow.emissiveIntensity = on * 3.4;
+    lampGlow.emissiveIntensity = roadLampGlow.emissiveIntensity = on * 3.4;
   };
 
   // ---------- the camera: the approach on scroll, free orbit, the walk, the tour ----------
@@ -560,8 +571,13 @@ async function init() {
   const pointer = new THREE.Vector2(-2, -2);
   const gold = new THREE.Color('#d9b263'), goldHot = new THREE.Color('#f0c766'), dim = new THREE.Color('#9f978c');
   let hovered = -1, selected = -1, pickDirty = false, filter = 'all';
+  let homes = { // how the homes are drawn: one instance each here, one run of vertices each in the Blender model
+    pick: (rc) => { const hit = rc.intersectObject(flats, false)[0]; return hit && records[hit.instanceId]?.home ? hit.instanceId : -1; },
+    paint: (i, c) => { flats.setColorAt(i, c); flats.instanceColor.needsUpdate = true; },
+    base: (i) => flatColours[i],
+  };
   const shown = (i) => filter === 'all' || !records[i].home || (records[i].type && records[i].type.startsWith(filter));
-  const paint = (i) => { if (i < 0) return; flats.setColorAt(i, i === selected ? goldHot : i === hovered ? gold : shown(i) ? flatColours[i] : dim); flats.instanceColor.needsUpdate = true; };
+  const paint = (i) => { if (i < 0 || i >= records.length) return; homes.paint(i, i === selected ? goldHot : i === hovered ? gold : shown(i) ? homes.base(i) : dim); };
   const setHover = (i) => {
     if (i === hovered) return;
     const old = hovered; hovered = i; paint(old); paint(i); canvas.style.cursor = i >= 0 ? 'pointer' : '';
@@ -570,8 +586,7 @@ async function init() {
   let overGate = false;
   const pickAt = () => {
     raycaster.setFromCamera(pointer, camera);
-    const hit = raycaster.intersectObject(flats, false)[0];
-    const i = hit && records[hit.instanceId]?.home ? hit.instanceId : -1;
+    const i = homes.pick(raycaster);
     setHover(i);
     overGate = i < 0 && mode !== 'walk' && raycaster.intersectObjects(gateParts, false).length > 0; // the gate: a click walks you in
     if (overGate) { canvas.style.cursor = 'pointer'; if (tip) { tip.textContent = 'Walk in at the gate'; tip.hidden = false; } }
@@ -668,6 +683,51 @@ async function init() {
 
   stage.append(canvas);
   if (reduced) renderOnce(); else start();
+
+  // ---------- the Blender model: the plot inside the wall and the gate, built by blender/build_site.py; it replaces the drawn plot when it arrives ----------
+  const loadModel = () => {
+    const draco = new DRACOLoader(); draco.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/gltf/');
+    const gltf = new GLTFLoader(); gltf.setDRACOLoader(draco);
+    gltf.load('./assets/models/ratan-galaxy.glb', ({ scene: model }) => {
+      const byName = {}, flatMeshes = [];
+      let glbGlass, glbWater, glbLamp;
+      model.traverse((o) => {
+        if (!o.isMesh) return;
+        byName[o.name] = o; o.castShadow = o.receiveShadow = shadows;
+        const m = o.material;
+        if (m.name === 'glass') glbGlass = m; else if (m.name === 'water') glbWater = m; else if (m.name === 'lamp_glow') glbLamp = m;
+        if (!m.transparent && m.name !== 'glass') m.side = THREE.FrontSide;
+        if (m.name === 'glass' || m.name === 'club_glass' || m.name === 'water') m.envMapIntensity = 1.2;
+        if (o.geometry.attributes._flat) flatMeshes.push(o);
+      });
+      if (!flatMeshes.length) return;
+      // one box per home: the _flat attribute says which, the object's flats list says block, floor and number
+      const parts = [], list = [];
+      flatMeshes.sort((a, b) => a.name.localeCompare(b.name)).forEach((mesh) => {
+        const own = JSON.parse(mesh.userData.flats || '[]'), offset = list.length;
+        const ids = mesh.geometry.attributes._flat, col = mesh.geometry.attributes.color;
+        const verts = [], base = [];
+        for (let v = 0; v < ids.count; v++) { const id = Math.round(ids.getX(v)); (verts[id] ||= []).push(v); }
+        own.forEach((r) => { const v0 = verts[r.i][0]; base[r.i] = new THREE.Color(col.getX(v0), col.getY(v0), col.getZ(v0)); list.push({ block: r.block, floor: r.floor, flat: r.flat, type: flatType(r.block, r.flat), home: true }); });
+        const part = { mesh, offset, verts, col, base }; parts.push(part); mesh.userData.part = part;
+      });
+      const partOf = (i) => parts.findLast((p) => i >= p.offset) || parts[0];
+      const glbHomes = {
+        pick: (rc) => { const hit = rc.intersectObjects(flatMeshes, false)[0]; if (!hit) return -1; const p = hit.object.userData.part; return p.offset + Math.round(hit.object.geometry.attributes._flat.getX(hit.face.a)); },
+        paint: (i, c) => { const p = partOf(i); for (const v of p.verts[i - p.offset] || []) p.col.setXYZ(v, c.r, c.g, c.b); p.col.needsUpdate = true; },
+        base: (i) => { const p = partOf(i); return p.base[i - p.offset]; },
+      };
+      const oldSel = selected; setHover(-1); selected = -1; paint(oldSel);
+      records = list; homes = glbHomes;
+      gateParts = ['gate_pillars', 'gate_beam', 'gate_cornice', 'gate_board', 'gate_name', 'gate_sub'].map((n) => byName[n]).filter(Boolean);
+      if (glbGlass) glass = glbGlass; if (glbWater) waterMat = glbWater; if (glbLamp) lampGlow = glbLamp;
+      scene.remove(plot); plot.traverse((o) => { if (o.isMesh) o.geometry.dispose(); });
+      scene.add(model);
+      setFilter(filter);
+      if (reduced) renderOnce(); else start();
+    }, undefined, () => {}); // the drawn plot stays if the model cannot be fetched
+  };
+  loadModel();
 
   // a still of the scene, for the static fallback picture and the social image
   window.__heroSnapshot = (w = 1600, h = 900, light = 0.15, at = 0.3) => {

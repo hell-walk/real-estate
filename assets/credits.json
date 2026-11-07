@@ -154,5 +154,51 @@
     "saved": "2026-11-06T15:12:15.113126Z",
     "sourceWidth": 1600,
     "sourceHeight": 1086
+  },
+  {
+    "file": "assets/ratan-galaxy-blender-day.jpg",
+    "media": "image",
+    "ref": "polyhaven:kloofendal_48d_partly_cloudy_puresky",
+    "title": "The site model of Ratan Galaxy, day, rendered in Blender",
+    "creator": "this site (model); Poly Haven (sky)",
+    "creatorUrl": "https://polyhaven.com",
+    "date": "2026-11-07",
+    "license": "CC0 1.0",
+    "licenseCode": "cc0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "creditRequired": false,
+    "page": "https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky",
+    "via": "Blender 5.2, Cycles, blender/build_site.py and blender/render_stills.py",
+    "width": 1800,
+    "height": 1012,
+    "bytes": 220652,
+    "credit": "The site model rendered in Blender under the Poly Haven sky “Kloofendal 48d Partly Cloudy (Pure Sky)” (CC0)",
+    "notes": [
+      "Served at 900, 1800 and 2800 px wide; the glb of the same model is assets/models/ratan-galaxy.glb"
+    ],
+    "saved": "2026-11-07T18:45:00Z"
+  },
+  {
+    "file": "assets/ratan-galaxy-blender-dusk.jpg",
+    "media": "image",
+    "ref": "polyhaven:kloppenheim_06_puresky",
+    "title": "The site model of Ratan Galaxy, dusk, rendered in Blender",
+    "creator": "this site (model); Poly Haven (sky)",
+    "creatorUrl": "https://polyhaven.com",
+    "date": "2026-11-07",
+    "license": "CC0 1.0",
+    "licenseCode": "cc0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "creditRequired": false,
+    "page": "https://polyhaven.com/a/kloppenheim_06_puresky",
+    "via": "Blender 5.2, Cycles, blender/build_site.py and blender/render_stills.py",
+    "width": 1800,
+    "height": 1012,
+    "bytes": 208214,
+    "credit": "The site model rendered in Blender under the Poly Haven sky “Kloppenheim 06 (Pure Sky)” (CC0)",
+    "notes": [
+      "Served at 900, 1800 and 2800 px wide; the glb of the same model is assets/models/ratan-galaxy.glb"
+    ],
+    "saved": "2026-11-07T18:45:00Z"
   }
 ]
