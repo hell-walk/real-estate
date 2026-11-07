@@ -624,7 +624,10 @@ async function init() {
 
   // the time of day: runs on its own until the slider is touched
   let manualLight = null;
-  timeInput?.addEventListener('input', () => { manualLight = Number(timeInput.value) / 100; start(); });
+  timeInput?.addEventListener('input', () => { manualLight = Number(timeInput.value) / 100; start(); pressPreset(); });
+  const presets = Array.from(document.querySelectorAll('[data-time-set]'));
+  const pressPreset = () => { const v = manualLight === null ? null : Math.round(manualLight * 100); presets.forEach((b) => b.setAttribute('aria-pressed', String(v !== null && Math.abs(Number(b.dataset.timeSet) - v) < 8))); };
+  presets.forEach((b) => b.addEventListener('click', () => { manualLight = Number(b.dataset.timeSet) / 100; if (timeInput) timeInput.value = b.dataset.timeSet; start(); pressPreset(); }));
 
   // ---------- size, visibility, loop ----------
   const resize = () => {
