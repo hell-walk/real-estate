@@ -196,12 +196,14 @@ async function init() {
   for (let z = -23; z <= 23; z += 12) { pier(-120, z); pier(120, z); }
   piers.count = pc; piers.castShadow = shadows; scene.add(piers);
   const pillarMat = new THREE.MeshStandardMaterial({ color: '#f3f0ea', roughness: 0.9 }); // the gate, the canopies and the gatehouse roof are white plaster, as in the photographs
-  [[4.5, 35], [19.5, 35]].forEach(([x, z]) => { const p = new THREE.Mesh(new THREE.BoxGeometry(1.4, 5, 1.4), pillarMat); p.position.set(x, 2.5, z); p.castShadow = shadows; scene.add(p); });
+  const gateParts = [];
+  [[4.5, 35], [19.5, 35]].forEach(([x, z]) => { const p = new THREE.Mesh(new THREE.BoxGeometry(1.4, 5, 1.4), pillarMat); p.position.set(x, 2.5, z); p.castShadow = shadows; scene.add(p); gateParts.push(p); });
   const gateBeam = new THREE.Mesh(new THREE.BoxGeometry(16.4, 0.5, 1.4), pillarMat); gateBeam.position.set(12, 5.3, 35); gateBeam.castShadow = shadows; scene.add(gateBeam);
   const gateCornice = new THREE.Mesh(new THREE.BoxGeometry(17.6, 0.3, 2.2), pillarMat); gateCornice.position.set(12, 5.7, 35); gateCornice.castShadow = shadows; scene.add(gateCornice); // the moulded cornice over the gate
   const boardSide = new THREE.MeshStandardMaterial({ color: '#1b1613' }), boardFace = new THREE.MeshStandardMaterial({ map: boardTex, roughness: 0.6 });
   const board = new THREE.Mesh(new THREE.BoxGeometry(11, 2.4, 0.3), [boardSide, boardSide, boardSide, boardSide, boardFace, boardFace]);
   board.position.set(12, 7.1, 35); board.castShadow = shadows; scene.add(board);
+  gateParts.push(gateBeam, gateCornice, board);
   const leafTex = grilleTex.clone(); leafTex.repeat.set(7, 3); leafTex.needsUpdate = true;
   const gateLeaf = new THREE.Mesh(new THREE.PlaneGeometry(7, 2.4), new THREE.MeshStandardMaterial({ map: leafTex, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.6, metalness: 0.4 }));
   gateLeaf.position.set(5.2 + 3.5 * Math.cos(1.2), 1.4, 35 - 3.5 * Math.sin(1.2)); gateLeaf.rotation.y = -1.2; scene.add(gateLeaf); // one leaf, standing open
@@ -565,11 +567,14 @@ async function init() {
     const old = hovered; hovered = i; paint(old); paint(i); canvas.style.cursor = i >= 0 ? 'pointer' : '';
     if (tip) { if (i >= 0) { const r = records[i]; tip.textContent = `Block ${r.block} · ${ordinal(r.floor)} floor · flat ${r.flat} · ${PLANS[r.type]?.name || ''}`; tip.hidden = false; } else tip.hidden = true; }
   };
+  let overGate = false;
   const pickAt = () => {
     raycaster.setFromCamera(pointer, camera);
     const hit = raycaster.intersectObject(flats, false)[0];
     const i = hit && records[hit.instanceId]?.home ? hit.instanceId : -1;
     setHover(i);
+    overGate = i < 0 && mode !== 'walk' && raycaster.intersectObjects(gateParts, false).length > 0; // the gate: a click walks you in
+    if (overGate) { canvas.style.cursor = 'pointer'; if (tip) { tip.textContent = 'Walk in at the gate'; tip.hidden = false; } }
     return i;
   };
   const setFilter = (f) => { filter = f; for (let i = 0; i < records.length; i++) paint(i); ui?.querySelectorAll('[data-filter]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === f))); start(); };
@@ -599,6 +604,7 @@ async function init() {
     if (!downAt || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 8) { downAt = null; return; }
     downAt = null; setPointer(e);
     const i = pickAt();
+    if (i < 0 && overGate) { setMode('walk'); return; }
     const old = selected; selected = i; paint(old); paint(i);
     if (i >= 0) showCard(records[i]);
   };

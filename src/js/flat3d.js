@@ -82,6 +82,7 @@ function init() {
   // ---------- the panel: name the flat, list the rooms ----------
   const q = (sel) => panel.querySelector(sel);
   q('[data-where]').textContent = flatTitle(here);
+  const barUrl = document.querySelector('[data-flat-url]'); if (barUrl) barUrl.textContent = `ratangalaxy.sample / block-${here.block.toLowerCase()} / floor-${here.floor} / flat-${here.flat}`;
   q('[data-type]').textContent = plan.name;
   q('[data-facts]').textContent = `${plan.superArea.toLocaleString('en-IN')} sq ft super area, ${plan.carpet} carpet · sample price ${plan.priceText} · ${BLOCKS[here.block].phase}, finished ${BLOCKS[here.block].done}`;
   q('[data-block-link]').href = `/towers/block-${here.block.toLowerCase()}.html`;
@@ -98,7 +99,7 @@ function init() {
   try { renderer = new THREE.WebGLRenderer({ antialias: !coarse, powerPreference: 'high-performance' }); } catch { stage.classList.add('no-3d'); loader.done(); return; }
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, coarse ? 1.25 : 1.75));
   renderer.shadowMap.enabled = !coarse; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.92;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   const canvas = renderer.domElement;
   canvas.setAttribute('aria-label', 'The flat in three dimensions. Drag to look, keys to move, drag a piece to place it.');
@@ -242,14 +243,14 @@ function init() {
     if ((mat === wallMat || mat.userData.accent) && y0 === 0 && y1 === WALL_H) { const co = new THREE.Mesh(new THREE.BoxGeometry(dir === 'h' ? len : thick + 0.05, 0.07, dir === 'h' ? thick + 0.05 : len), corniceMat); co.position.set(m.position.x, WALL_H - 0.035, m.position.z); flatGroup.add(co); }
     if ((mat === wallMat || mat.userData.accent) && y0 === 0) { const sk = new THREE.Mesh(new THREE.BoxGeometry(dir === 'h' ? len : thick + 0.03, 0.1, dir === 'h' ? thick + 0.03 : len), skirtMat); sk.position.set(m.position.x, 0.05, m.position.z); flatGroup.add(sk); }
   };
-  const doorAt = (dir, c, p, qq) => { // a frame round the opening and a leaf standing open on its hinge
+  const doorAt = (dir, c, p, qq, open = true) => { // a frame round the opening and a leaf on its hinge, standing open or shut
     const w = M(qq - p); if (w < 0.5) return;
     const jamb = (at) => { const j = new THREE.Mesh(new THREE.BoxGeometry(dir === 'h' ? 0.06 : WALL_T + 0.04, DOOR_H, dir === 'h' ? WALL_T + 0.04 : 0.06), frameMat); j.position.set(dir === 'h' ? M(at) : M(c), DOOR_H / 2, dir === 'h' ? M(c) : M(at)); flatGroup.add(j); };
     jamb(p); jamb(qq);
     const hinge = new THREE.Group(); hinge.position.set(dir === 'h' ? M(p) + 0.03 : M(c), 0, dir === 'h' ? M(c) : M(p) + 0.03);
     const leaf = new THREE.Mesh(new THREE.BoxGeometry(w - 0.08, DOOR_H - 0.04, 0.04), doorMat); leaf.position.set((w - 0.08) / 2, DOOR_H / 2, 0); leaf.castShadow = true;
     const knob = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 6), railMat); knob.position.set(w - 0.2, 1.0, 0.04);
-    hinge.add(leaf, knob); hinge.rotation.y = (dir === 'h' ? 0 : -Math.PI / 2) + 1.25; flatGroup.add(hinge);
+    hinge.add(leaf, knob); hinge.rotation.y = (dir === 'h' ? 0 : -Math.PI / 2) + (open ? 1.25 : 0); flatGroup.add(hinge);
   };
   for (const L of lines.values()) {
     const cuts = [...new Set([...L.items.flatMap((i) => [i.a, i.b]), ...L.doors.flatMap((d) => [d[0], d[1]]), ...L.opens.flatMap((o) => [o[0], o[1]])].map((v) => +v.toFixed(3)))].sort((a, b) => a - b);
@@ -260,7 +261,11 @@ function init() {
       if (!covering.length) continue;
       const seg = L.dir === 'h' ? [M(p), M(L.c), M(qq), M(L.c)] : [M(L.c), M(p), M(L.c), M(qq)];
       const door = L.doors.find((d) => d[0] - 0.01 <= mid && d[1] + 0.01 >= mid);
-      if (door) { openings.push(seg); piece(L.dir, L.c, p, qq, DOOR_H, WALL_H, wallMat); if (door[2]) piece(L.dir, L.c, p, qq, 0.02, DOOR_H, glassMat, 0.03); else doorAt(L.dir, L.c, p, qq); continue; } // a balcony door is glass
+      if (door) { // a balcony door is glass; the front door, the one on an outer wall that is not a balcony's, stays shut, since there is nothing to walk out into
+        const front = covering.length === 1 && !door[2];
+        if (!front) openings.push(seg);
+        piece(L.dir, L.c, p, qq, DOOR_H, WALL_H, wallMat); if (door[2]) piece(L.dir, L.c, p, qq, 0.02, DOOR_H, glassMat, 0.03); else doorAt(L.dir, L.c, p, qq, !front); continue;
+      }
       if (L.opens.some((o) => o[0] - 0.01 <= mid && o[1] + 0.01 >= mid)) { openings.push(seg); continue; }
       const outer = covering.length === 1, room = covering[0].room;
       if (outer && room.kind === 'balcony') { piece(L.dir, L.c, p, qq, 0, 0.12, railMat, 0.1); piece(L.dir, L.c, p, qq, 0.98, 1.05, railMat, 0.06); for (let s = p + 0.5; s < qq; s += 1.5) piece(L.dir, L.c, s, s + 0.12, 0.1, 1.0, railMat, 0.05); continue; }
@@ -524,7 +529,7 @@ function init() {
     resize(); fitPlan();
   };
   panel.querySelectorAll('[data-view]').forEach((b) => b.addEventListener('click', () => { setView(b.dataset.view); canvas.focus({ preventScroll: true }); }));
-  roomsList.addEventListener('click', (e) => { const id = e.target.dataset.room; if (!id) return; const r = byId[id]; walker.pos.set(r.mx + r.mw / 2, 1.6, r.mz + r.md / 2); walker.pitch = 0; setView('walk'); canvas.focus({ preventScroll: true }); });
+  roomsList.addEventListener('click', (e) => { const id = e.target.dataset.room; if (id) goTo(byId[id]); });
   const fitPlan = () => {
     const w = stage.clientWidth || 1, h = stage.clientHeight || 1;
     const pw = bounds.x1 - bounds.x0 + 2, ph = bounds.z1 - bounds.z0 + 2;
@@ -538,7 +543,8 @@ function init() {
 
   // ---------- room labels, kept in HTML so they stay crisp ----------
   const labelsBox = document.getElementById('flat-labels');
-  const labels = rooms.map((r) => { const s = document.createElement('span'); s.textContent = r.name; labelsBox?.append(s); return { r, s, v: new THREE.Vector3() }; });
+  const goTo = (r) => { walker.pos.set(r.mx + r.mw / 2, 1.6, r.mz + r.md / 2); walker.pitch = 0; setView('walk'); canvas.focus({ preventScroll: true }); };
+  const labels = rooms.map((r) => { const s = document.createElement('button'); s.type = 'button'; s.textContent = r.name; s.setAttribute('aria-label', `Go to the ${r.name.toLowerCase()}`); s.addEventListener('click', () => goTo(r)); labelsBox?.append(s); return { r, s, v: new THREE.Vector3() }; });
   const hereBox = document.querySelector('[data-here]');
   let hereRoom = null;
   const placeLabels = () => {
