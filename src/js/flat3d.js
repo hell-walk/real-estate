@@ -24,7 +24,7 @@ const loader = (() => { // the loading card over the picture
     done() { if (finished) return; finished = true; this.set(100, 'Done'); el.classList.add('is-done'); setTimeout(() => { el.hidden = true; }, 600); },
   };
 })();
-const WINDOWED = new Set(['living', 'dining', 'bed', 'kitchen', 'servant', 'dress']);
+const WINDOWED = new Set(['living', 'dining', 'bed', 'kitchen', 'study', 'dress']);
 
 // ---------- the catalogue ----------
 // Real pieces at their real size: CC0 models from Poly Haven in assets/models (credits.json there names the makers),
@@ -140,7 +140,7 @@ function init() {
     balcony: { tex: makeTex(256, (g, s) => { speckle(g, s, '#b86f4e', 5000, 0.16, 0.06, 3); grid(g, s, 64, 'rgba(60,30,20,0.4)', 3); }), edge: 0.6, rough: 0.8 },
     plain: { tex: makeTex(256, (g, s) => { speckle(g, s, '#cfc9bd', 4000, 0.08, 0.06, 3); grid(g, s, 128, 'rgba(60,50,40,0.25)'); }), edge: 0.6, rough: 0.6 },
   };
-  const FLOOR_OF = { living: 'tile', dining: 'tile', passage: 'tile', bed: 'tile', kitchen: 'kitchen', toilet: 'bath', balcony: 'balcony', store: 'tile', servant: 'plain', dress: 'tile' };
+  const FLOOR_OF = { living: 'tile', dining: 'tile', passage: 'tile', bed: 'tile', kitchen: 'kitchen', toilet: 'bath', balcony: 'balcony', store: 'tile', study: 'tile', dress: 'tile' };
   // glazed 4 by 2 ft wall tiles: up the toilet walls to 8 ft and over the kitchen counter
   const glazedTex = makeTex(256, (g, s) => { speckle(g, s, '#dfe4e4', 2500, 0.04, 0.1, 3); g.fillStyle = 'rgba(255,255,255,0.6)'; g.fillRect(0, 0, s, 3); g.fillRect(0, s / 2, s, 3); g.fillRect(0, 0, 3, s); }); glazedTex.repeat.set(1, 1);
   const glazedMat = new THREE.MeshStandardMaterial({ map: glazedTex, roughness: 0.2 });

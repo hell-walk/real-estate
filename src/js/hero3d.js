@@ -245,7 +245,7 @@ async function init() {
   for (const id of ['C', 'B', 'A']) {
     const block = BLOCKS[id], [bx, bz] = blockPos[id];
     const layout = floorLayout(block.shape);
-    const base = block.ground === 'shops' ? 0 : 1; // B and C stand on a plinth over the basement
+    const base = block.ground === 'shops' ? 0 : 1; // B and C stand on a plinth; the stilt floor under every block is the parking
     const top = base + (FLOORS + 1) * FH;
     layout.forEach((fl) => {
       solids.push({ x: bx + fl.cx, z: bz + fl.cz, rot: fl.rot, hl: fl.len / 2 + 0.9, hw: fl.wid / 2 + 1.2 });
@@ -473,7 +473,7 @@ async function init() {
   const stops = [
     { pos: [14, 7, 62], look: [12, 5, 34], text: 'The gate on the south road. Sector 12, Vrindavan Yojna, off Shaheed Path.' },
     { pos: [-26, 11, 60], look: [-80, 8, 28], text: 'The drive runs the length of the plot, with the parking row under the palms.' },
-    { pos: [-118, 22, 42], look: [-78, 16, 2], text: 'Block C, the west tower: 126 homes over the basement parking, finished in 2018.' },
+    { pos: [-118, 22, 42], look: [-78, 16, 2], text: 'Block C, the west tower: 126 homes over the stilt parking, finished in 2018.' },
     { pos: [-19, 16, 60], look: [-19, 14, 1], text: 'Block B, the two bedroom block in the middle of the plan.' },
     { pos: [96, 16, 36], look: [92, 2, -6], text: 'The pool, the sand pit and the club at the east end, with the courts behind.' },
     { pos: [72, 12, 54], look: [40, 14, 2], text: 'Block A, the Phase II tower, with shops on the ground floor. Finished November 2024.' },
