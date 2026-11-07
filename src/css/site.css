@@ -282,9 +282,16 @@ ul.slips { position: absolute; left: 0; right: 0; bottom: 0; display: flex; alig
 }
 
 /* ---------- the printed sheet ---------- */
-.sheet-band { position: relative; padding-block: calc(var(--section) * 0.5) var(--section); overflow: clip; }
-.sheet-band .map { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.sheet { position: relative; width: min(640px, 100%); margin-left: auto; margin-right: calc(var(--margin) + 4vw); background: var(--paper); color: var(--paper-ink); padding: 4rem; text-align: center; clip-path: polygon(0 12px, 2.5% 0, 5% 12px, 7.5% 0, 10% 12px, 12.5% 0, 15% 12px, 17.5% 0, 20% 12px, 22.5% 0, 25% 12px, 27.5% 0, 30% 12px, 32.5% 0, 35% 12px, 37.5% 0, 40% 12px, 42.5% 0, 45% 12px, 47.5% 0, 50% 12px, 52.5% 0, 55% 12px, 57.5% 0, 60% 12px, 62.5% 0, 65% 12px, 67.5% 0, 70% 12px, 72.5% 0, 75% 12px, 77.5% 0, 80% 12px, 82.5% 0, 85% 12px, 87.5% 0, 90% 12px, 92.5% 0, 95% 12px, 97.5% 0, 100% 12px, 100% calc(100% - 12px), 97.5% 100%, 95% calc(100% - 12px), 92.5% 100%, 90% calc(100% - 12px), 87.5% 100%, 85% calc(100% - 12px), 82.5% 100%, 80% calc(100% - 12px), 77.5% 100%, 75% calc(100% - 12px), 72.5% 100%, 70% calc(100% - 12px), 67.5% 100%, 65% calc(100% - 12px), 62.5% 100%, 60% calc(100% - 12px), 57.5% 100%, 55% calc(100% - 12px), 52.5% 100%, 50% calc(100% - 12px), 47.5% 100%, 45% calc(100% - 12px), 42.5% 100%, 40% calc(100% - 12px), 37.5% 100%, 35% calc(100% - 12px), 32.5% 100%, 30% calc(100% - 12px), 27.5% 100%, 25% calc(100% - 12px), 22.5% 100%, 20% calc(100% - 12px), 17.5% 100%, 15% calc(100% - 12px), 12.5% 100%, 10% calc(100% - 12px), 7.5% 100%, 5% calc(100% - 12px), 2.5% 100%, 0 calc(100% - 12px)); }
+.sheet-band { position: relative; padding-block: calc(var(--section) * 0.6) var(--section); overflow: clip; }
+.sheet-band-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 5rem); align-items: end; }
+.sheet-band-head h2 { font-size: var(--step-display); line-height: 1; letter-spacing: -0.03em; }
+.sheet-band-head p { max-width: 48ch; }
+.sheet-band-head .text p + p { margin-top: 0.75rem; }
+.sheet-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 560px); gap: clamp(2rem, 5vw, 5rem); align-items: start; margin-top: 3rem; }
+.map-sheet { background: var(--paper); padding: 12px; transform: rotate(-1.2deg); position: sticky; top: 2rem; }
+.map-sheet img { display: block; width: 100%; height: auto; }
+.map-sheet figcaption { padding: 0.75rem 0.25rem 0.25rem; font-size: var(--step-small); color: var(--paper-muted); }
+.sheet { position: relative; width: 100%; background: var(--paper); color: var(--paper-ink); padding: 4rem; text-align: center; clip-path: polygon(0 12px, 2.5% 0, 5% 12px, 7.5% 0, 10% 12px, 12.5% 0, 15% 12px, 17.5% 0, 20% 12px, 22.5% 0, 25% 12px, 27.5% 0, 30% 12px, 32.5% 0, 35% 12px, 37.5% 0, 40% 12px, 42.5% 0, 45% 12px, 47.5% 0, 50% 12px, 52.5% 0, 55% 12px, 57.5% 0, 60% 12px, 62.5% 0, 65% 12px, 67.5% 0, 70% 12px, 72.5% 0, 75% 12px, 77.5% 0, 80% 12px, 82.5% 0, 85% 12px, 87.5% 0, 90% 12px, 92.5% 0, 95% 12px, 97.5% 0, 100% 12px, 100% calc(100% - 12px), 97.5% 100%, 95% calc(100% - 12px), 92.5% 100%, 90% calc(100% - 12px), 87.5% 100%, 85% calc(100% - 12px), 82.5% 100%, 80% calc(100% - 12px), 77.5% 100%, 75% calc(100% - 12px), 72.5% 100%, 70% calc(100% - 12px), 67.5% 100%, 65% calc(100% - 12px), 62.5% 100%, 60% calc(100% - 12px), 57.5% 100%, 55% calc(100% - 12px), 52.5% 100%, 50% calc(100% - 12px), 47.5% 100%, 45% calc(100% - 12px), 42.5% 100%, 40% calc(100% - 12px), 37.5% 100%, 35% calc(100% - 12px), 32.5% 100%, 30% calc(100% - 12px), 27.5% 100%, 25% calc(100% - 12px), 22.5% 100%, 20% calc(100% - 12px), 17.5% 100%, 15% calc(100% - 12px), 12.5% 100%, 10% calc(100% - 12px), 7.5% 100%, 5% calc(100% - 12px), 2.5% 100%, 0 calc(100% - 12px)); }
 .sheet h2 { font-size: var(--step-head); line-height: 1.1; }
 .sheet .note { margin: 0.5rem auto 0; font-size: var(--step-small); color: var(--paper-muted); max-width: 40ch; }
 .sheet-group { margin-top: 3.5rem; }
@@ -295,8 +302,14 @@ ul.slips { position: absolute; left: 0; right: 0; bottom: 0; display: flex; alig
 .sheet-item small { display: block; font-size: var(--step-small); color: var(--paper-muted); }
 .sheet-hours { margin-top: 3.5rem; }
 .sheet-hours p { max-width: none; }
+@media (max-width: 60em) {
+  .sheet-band-head { grid-template-columns: 1fr; align-items: start; }
+  .sheet-band-head p { margin-top: 1rem; }
+  .sheet-pair { grid-template-columns: 1fr; }
+  .map-sheet { position: static; transform: rotate(-0.6deg); }
+}
 @media (max-width: 48em) {
-  .sheet { margin-inline: 10px; width: auto; padding: 1.75rem; }
+  .sheet { padding: 1.75rem; }
   .sheet-group h3 { font-size: 1.25rem; }
   .sheet-item { font-size: 1rem; }
 }
