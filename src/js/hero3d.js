@@ -11,6 +11,13 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { VignetteShader } from 'three/addons/shaders/VignetteShader.js';
+import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
 import { BLOCKS, PLANS, flatType, ordinal } from './plans.js';
 
 const hero = document.querySelector('.hero');
@@ -91,6 +98,16 @@ async function init() {
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   scene.environmentIntensity = 0.45;
   pmrem.dispose();
+
+  // ---------- the picture: the scene in linear light, a glow off anything brighter than white (the sun, the lit windows and the lamps at dusk), a vignette, then the tone mapping ----------
+  const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 0 }));
+  composer.addPass(new RenderPass(scene, camera));
+  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), phone ? 0.3 : 0.42, 0.4, 1.4); composer.addPass(bloom);
+  const bloomSize = bloom.setSize.bind(bloom); bloom.setSize = (w, h) => bloomSize(w / 2, h / 2); // the glow is soft anyway: blur it at half size
+  const vignette = new ShaderPass(VignetteShader); vignette.uniforms.offset.value = 0.95; vignette.uniforms.darkness.value = 0.8; composer.addPass(vignette);
+  const fxaa = new ShaderPass(FXAAShader); fxaa.enabled = true; composer.addPass(fxaa); // the passes render off screen with no multisampling, so this smooths the edges (cheaper than a multisampled target)
+  composer.addPass(new OutputPass());
+  window.__heroPost = (on) => { bloom.enabled = on; vignette.enabled = on; }; // for the performance check
 
   // ---------- materials drawn on canvases: plaster, grass, asphalt, paving, railings, the gate board ----------
   const aniso = Math.min(8, renderer.capabilities.getMaxAnisotropy());
@@ -406,8 +423,8 @@ async function init() {
     waterMat.color.copy(day.water).lerp(dusk.water, u);
     cloudMat.color.setHex(0xfff8ee).lerp(new THREE.Color('#e08a62'), u);
     const on = THREE.MathUtils.smoothstep(u, 0.45, 0.92);
-    glass.emissiveIntensity = on * 1.7; glass.color.setHex(on > 0.2 ? 0xffe6b8 : 0xa9c0d2);
-    lampGlow.emissiveIntensity = on * 2.5;
+    glass.emissiveIntensity = on * 2.4; glass.color.setHex(on > 0.2 ? 0xffe6b8 : 0xa9c0d2);
+    lampGlow.emissiveIntensity = on * 3.4;
   };
 
   // ---------- the camera: the approach on scroll, free orbit, the walk, the tour ----------
@@ -607,7 +624,8 @@ async function init() {
   const resize = () => {
     const w = stage.clientWidth, h = stage.clientHeight;
     if (!w || !h) return;
-    renderer.setSize(w, h, false);
+    renderer.setSize(w, h, false); composer.setSize(w, h);
+    const pr = renderer.getPixelRatio(); fxaa.uniforms.resolution.value.set(1 / (w * pr), 1 / (h * pr));
     camera.aspect = w / h; camera.fov = mode === 'walk' ? (w < h ? 80 : 66) : (w < h ? 60 : 42); camera.updateProjectionMatrix();
   };
   new ResizeObserver(() => { resize(); if (reduced) renderOnce(); }).observe(stage);
@@ -615,16 +633,20 @@ async function init() {
 
   const clock = new THREE.Clock();
   let visible = true, raf = 0, started = false, lastMode = mode;
+  // a screen that cannot keep 30 frames a second for a while loses the glow and renders at one pixel a pixel
+  let slowFrames = 0, eased = false;
+  const easeOff = () => { eased = true; bloom.enabled = false; renderer.setPixelRatio(1); composer.setPixelRatio(1); resize(); };
   const render = () => {
     const dt = Math.min(0.1, clock.getDelta()), t = clock.getElapsedTime();
     if (mode !== lastMode) { lastMode = mode; resize(); }
-    px += (mouseX - px) * 0.05; py += (mouseY - py) * 0.05;
+    px = THREE.MathUtils.damp(px, mouseX, 3, dt); py = THREE.MathUtils.damp(py, mouseY, 3, dt);
     placeCamera(!started, dt);
     const u = manualLight ?? (reduced ? 0.25 : 0.5 - 0.5 * Math.cos((t / 84) * Math.PI * 2));
     setLight(u);
     if (timeInput && manualLight === null) timeInput.value = String(Math.round(u * 100));
     if (pickDirty) { pickDirty = false; pickAt(); }
-    renderer.render(scene, camera);
+    composer.render(dt);
+    if (started && !eased) { slowFrames = dt > 0.034 ? slowFrames + 1 : Math.max(0, slowFrames - 1); if (slowFrames > 45) easeOff(); }
     if (!started) { started = true; hero.classList.add('is-3d'); if (ui) ui.hidden = false; loader.done(); }
   };
   const loop = () => { raf = 0; if (!visible || document.hidden) return; render(); raf = requestAnimationFrame(loop); };
@@ -640,11 +662,11 @@ async function init() {
 
   // a still of the scene, for the static fallback picture and the social image
   window.__heroSnapshot = (w = 1600, h = 900, light = 0.15, at = 0.3) => {
-    const prevRatio = renderer.getPixelRatio(); renderer.setPixelRatio(1); renderer.setSize(w, h, false);
+    const prevRatio = renderer.getPixelRatio(); renderer.setPixelRatio(1); composer.setPixelRatio(1); renderer.setSize(w, h, false); composer.setSize(w, h);
     camera.aspect = w / h; camera.fov = w < h ? 60 : 42; camera.updateProjectionMatrix();
-    const saved = progress, savedMode = mode; mode = 'approach'; progress = at; px = 0; py = 0; placeCamera(true, 0); setLight(light); renderer.render(scene, camera);
+    const saved = progress, savedMode = mode; mode = 'approach'; progress = at; px = 0; py = 0; placeCamera(true, 0); setLight(light); composer.render();
     const data = canvas.toDataURL('image/jpeg', 0.86);
-    progress = saved; mode = savedMode; renderer.setPixelRatio(prevRatio); resize(); return data;
+    progress = saved; mode = savedMode; renderer.setPixelRatio(prevRatio); composer.setPixelRatio(prevRatio); resize(); return data;
   };
 }
 

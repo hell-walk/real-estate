@@ -7,6 +7,13 @@
 // Three.js 0.170.0 from the CDN; nothing here is needed to read the page.
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { VignetteShader } from 'three/addons/shaders/VignetteShader.js';
+import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { PLANS, FT, flatFromParams, flatTitle, BLOCKS, ordinal } from './plans.js';
 
@@ -104,6 +111,15 @@ function init() {
   const pmrem = new THREE.PMREMGenerator(renderer); scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture; scene.environmentIntensity = 0.5; pmrem.dispose();
   const walkCam = new THREE.PerspectiveCamera(68, 1, 0.05, 600);
   const planCam = new THREE.OrthographicCamera(-10, 10, 10, -10, 0.1, 200);
+  // the picture: the rooms in linear light, a glow off the lamps and the sun in the windows, a light vignette, then the tone mapping
+  const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 0 }));
+  const renderPass = new RenderPass(scene, walkCam); composer.addPass(renderPass);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), coarse ? 0.25 : 0.32, 0.4, 1.25); composer.addPass(bloom);
+  const bloomSize = bloom.setSize.bind(bloom); bloom.setSize = (w, h) => bloomSize(w / 2, h / 2);
+  const vignette = new ShaderPass(VignetteShader); vignette.uniforms.offset.value = 0.9; vignette.uniforms.darkness.value = 0.55; composer.addPass(vignette);
+  const fxaa = new ShaderPass(FXAAShader); fxaa.enabled = true; composer.addPass(fxaa);
+  composer.addPass(new OutputPass());
+  window.__flatPost = (on) => { bloom.enabled = on; }; // for the performance check
   planCam.up.set(0, 0, -1);
   let view = 'walk';
 
@@ -516,7 +532,7 @@ function init() {
     planCam.left = -w * s / 2; planCam.right = w * s / 2; planCam.top = h * s / 2; planCam.bottom = -h * s / 2;
     planCam.position.set(centre.x, 40, centre.z); planCam.lookAt(centre.x, 0, centre.z); planCam.updateProjectionMatrix();
   };
-  const resize = () => { const w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false); walkCam.aspect = w / h; walkCam.fov = w < h ? 78 : 68; walkCam.updateProjectionMatrix(); fitPlan(); };
+  const resize = () => { const w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false); composer.setSize(w, h); const pr = renderer.getPixelRatio(); fxaa.uniforms.resolution.value.set(1 / (w * pr), 1 / (h * pr)); walkCam.aspect = w / h; walkCam.fov = w < h ? 78 : 68; walkCam.updateProjectionMatrix(); fitPlan(); };
   new ResizeObserver(resize).observe(stage);
   resize();
 
@@ -563,7 +579,7 @@ function init() {
     marker.position.set(walker.pos.x, 0.06, walker.pos.z); marker.rotation.y = walker.yaw;
     sky.position.copy(walker.pos);
     if (!reduced) fans.forEach((b) => { b.rotation.y += dt * 7; });
-    renderer.render(scene, cam());
+    renderPass.camera = cam(); vignette.enabled = view === 'walk'; composer.render(dt);
     placeLabels();
     raf = requestAnimationFrame(render);
   };
