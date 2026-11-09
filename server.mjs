@@ -17,7 +17,7 @@ import * as pages from './lib/pages.mjs';
 const PORT = Number(process.env.PORT || 4321);
 const ADMIN_USER = process.env.ADMIN_USER || 'lounge';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ridge-2026';
-const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.json': 'application/json', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.ico': 'image/x-icon', '.txt': 'text/plain; charset=utf-8', '.woff2': 'font/woff2', '.xml': 'application/xml', '.csv': 'text/csv; charset=utf-8', '.gltf': 'model/gltf+json', '.bin': 'application/octet-stream' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.json': 'application/json', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.ico': 'image/x-icon', '.txt': 'text/plain; charset=utf-8', '.woff2': 'font/woff2', '.xml': 'application/xml', '.csv': 'text/csv; charset=utf-8', '.gltf': 'model/gltf+json', '.glb': 'model/gltf-binary', '.bin': 'application/octet-stream' };
 const HTML = TYPES['.html'];
 
 // ---------- rebuild when a source file changed ----------
@@ -30,9 +30,14 @@ async function newest(dir) {
   }
   return t;
 }
+let building = null; // one build at a time: a page's requests arrive together, and two builds at once delete each other's output
 async function ensureBuilt() {
-  const t = Math.max(await newest(SRC), await newest(join(ROOT, 'lib')), (await stat(join(ROOT, 'build.mjs'))).mtimeMs);
-  if (t > builtAt) { await build(); builtAt = Date.now(); }
+  if (building) return building;
+  building = (async () => {
+    const t = Math.max(await newest(SRC), await newest(join(ROOT, 'lib')), (await stat(join(ROOT, 'build.mjs'))).mtimeMs);
+    if (t > builtAt) { await build(); builtAt = Date.now(); }
+  })().finally(() => { building = null; });
+  return building;
 }
 
 // ---------- helpers ----------

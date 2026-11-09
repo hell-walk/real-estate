@@ -180,6 +180,7 @@ def step_materials():
     material('balcony', '#5c6b7e', 0.95)
     material('rail', '#1c1a19', 0.6, 0.4, alpha=0.72)
     material('glass', '#5c7082', 0.15, 0.6, emit='#ffb860', emit_strength=0.0)
+    material('glass_dark', '#2c3644', 0.15, 0.6)   # the windows with nobody home: they stay dark when the others light up
     material('ac', '#d9d9d6', 0.7, 0.2)
     material('column', '#b9b3a9', 0.95)
     material('shops', '#7f94a6', 0.9)
@@ -369,6 +370,7 @@ def step_block(bid):
     balc = Builder(f'{bid}_balconies', material('balcony'))
     rails = Builder(f'{bid}_rails', material('rail'))
     glass = Builder(f'{bid}_glass', material('glass'))
+    dark = Builder(f'{bid}_glass_dark', material('glass_dark'))
     acs = Builder(f'{bid}_ac', material('ac'))
     records = []
     for fl in layout:
@@ -401,12 +403,12 @@ def step_block(bid):
                     if floor == 0 and bid == 'A' and k == 2 and fl['wing'] == 2 and fl['side'] == 1 and fl['tip']:
                         continue   # eleven shop fronts, not twelve
                     ww, wh = (2.6, 2.4) if floor == 0 else (1.5, 1.3)
-                    glass.plane(place(cx, cz, rot, wx, y + (1.5 if floor == 0 else 1.7), zf), ww, wh, rot_x=s * math.pi / 2, rot_z=rot)
+                    (glass if floor == 0 or rnd() < 0.56 else dark).plane(place(cx, cz, rot, wx, y + (1.5 if floor == 0 else 1.7), zf), ww, wh, rot_x=s * math.pi / 2, rot_z=rot)
                     if floor > 0 and k != 1 and rnd() < 0.4:
                         acs.box(place(cx, cz, rot, wx + 0.9, y + 0.85, s * (W / 2 + 0.2)), (0.6, 0.35, 0.45), rot_z=rot)
                 if fl['tip'] and floor > 0:
                     for k in (-1.6, 1.6):
-                        glass.plane(place(cx, cz, rot, td * (L / 2 + 0.03), y + 1.7, k), 1.5, 1.3, rot_y=td * math.pi / 2, rot_z=rot)
+                        (glass if rnd() < 0.56 else dark).plane(place(cx, cz, rot, td * (L / 2 + 0.03), y + 1.7, k), 1.5, 1.3, rot_y=td * math.pi / 2, rot_z=rot)
                 if floor > 0 and not fl['lobby']:
                     balc.box(place(cx, cz, rot, L * 0.18, y + 0.19, s * (W / 2 + 0.65)), (3.2, 1.3, 0.18), rot_z=rot)
                     rails.box(place(cx, cz, rot, L * 0.18, y + 0.75, s * (W / 2 + 1.27)), (3.2, 0.05, 1.0), rot_z=rot)
@@ -438,7 +440,7 @@ def step_block(bid):
     canopy.box((bx, -cz_, base + 3.3), (9, 5, 0.3))
     canopy.build()
     flats.build(extras={'flats': json.dumps(records), 'block': bid})
-    for b in (stilt, slabs, blue, balc, rails, glass, acs):
+    for b in (stilt, slabs, blue, balc, rails, glass, dark, acs):
         b.build()
     return len(records)
 

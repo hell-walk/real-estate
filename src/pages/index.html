@@ -4,7 +4,7 @@
     <div class="hero-copy">
       <p class="hero-kicker"><!-- taste-skill-ignore --><span class="tag">Finished, and lived in</span><span class="kicker">Sector 12 · off Shaheed Path · Lucknow</span></p>
       <h1 class="hero-title" id="hero-title">Ratan Galaxy.<br>378 finished homes in <em>Vrindavan Yojna</em>.</h1>
-      <p>Two, three and four bedroom homes in three blocks on 4.16 acres, handed over in 2018 and 2024. The model below is the society as built: drag it to look round, walk in at the gate, click any home to open it in 3D.</p>
+      <p>Two, three and four bedroom homes in three blocks on 4.16 acres, handed over in 2018 and 2024. The model below is the society as built, seen from above at dusk: drag it to turn it, click any home to select it, and open that flat in 3D.</p>
       <div class="hero-actions"><a class="button" href="./book-a-visit.html">Book a site visit</a><a class="button soft" href="./homes.html">The six floor plans</a></div>
     </div>
     <aside class="hero-facts" aria-label="The society in figures">
@@ -19,45 +19,51 @@
     </aside>
   </div>
   <div class="hero-card taped">
-    <div class="hero-bar"><span class="hero-bar-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="hero-bar-url" aria-hidden="true">ratangalaxy.sample / sector-12 / site-model</span><span class="hero-bar-tag">Site model</span><span class="hero-presets" role="group" aria-label="Time of day"><button type="button" data-time-set="15" aria-pressed="true">Day</button><button type="button" data-time-set="60" aria-pressed="false">Evening</button><button type="button" data-time-set="100" aria-pressed="false">Dusk</button></span></div>
-    <div class="hero-stage" id="hero-stage" aria-hidden="true">
-      <img src="./assets/hero-fallback.jpg" alt="" width="1600" height="900" fetchpriority="high">
+    <div class="hero-bar"><p class="hero-bar-title"><strong>Ratan Galaxy - Architectural Overview</strong><span>Phase 2 construction complete</span></p></div>
+    <div class="hero-view">
+      <div class="hero-stage" id="hero-stage" aria-hidden="true">
+        <img src="./assets/hero-fallback.jpg" alt="" width="1600" height="900" fetchpriority="high">
+      </div>
+      {{> loader}}
+      <p class="hero-viewtag" data-view aria-hidden="true">Iso kit · Orthographic</p>
+      <div class="hero-ui" id="hero-ui" hidden>
+        <p class="hero-caption" data-caption hidden></p>
+        <div class="hero-dpad" data-dpad hidden aria-label="Walk">
+          <button type="button" data-key="w" aria-label="Forward">↑</button><button type="button" data-key="a" aria-label="Left">←</button><button type="button" data-key="s" aria-label="Back">↓</button><button type="button" data-key="d" aria-label="Right">→</button>
+        </div>
+        <span class="hero-tip" data-tip hidden></span>
+      </div>
+      <div class="hero-pick" id="hero-pick" hidden>
+        <p class="pick-head"><!-- taste-skill-ignore --><span class="tag">Selected unit</span><span class="pick-status">Ready possession</span></p>
+        <h2 data-where>Unit 502 · Block B</h2>
+        <p class="pick-type" data-type>Click any home on the towers, or find one by block, floor and number.</p>
+        <p class="pick-foot"><strong data-price></strong><a data-open href="./flat.html">Enter spatial twin <span aria-hidden="true">→</span></a></p>
+        <form method="get" action="./flat.html" data-find hidden>
+          <div class="form-grid three">
+            <div><label class="label" for="hp-block">Block</label><select class="field" id="hp-block" name="block"><option>A</option><option selected>B</option><option>C</option></select></div>
+            <div><label class="label" for="hp-floor">Floor</label><select class="field" id="hp-floor" name="floor"><option>1</option><option>2</option><option>3</option><option>4</option><option selected>5</option><option>6</option><option>7</option><option>8</option><option>9</option></select></div>
+            <div><label class="label" for="hp-flat">Flat</label><select class="field" id="hp-flat" name="flat"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option></select></div>
+          </div>
+          <p><button class="button ink wide" type="submit">Show it</button></p>
+        </form>
+      </div>
+      <a class="button hero-launch" data-launch href="./flat.html" hidden><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3 20 7.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="M4 7.5 12 12l8-4.5M12 12v9"/></svg>Launch 3D flat spatial twin</a>
     </div>
-    {{> loader}}
-  <div class="hero-ui" id="hero-ui" hidden>
-    <div class="hero-ui-buttons">
-      <button type="button" class="button" data-tour>Take the tour</button>
-      <button type="button" class="button ghost" data-walk>Walk the grounds</button>
-      <button type="button" class="button ghost" data-pick>Find a flat</button>
-      <button type="button" class="button ghost" data-reset hidden>Reset the view</button>
-    </div>
-    <div class="hero-tools">
-      <label class="hero-time"><span>Time of day</span><input type="range" min="0" max="100" value="15" data-time aria-label="Time of day, afternoon to dusk"></label>
-      <div class="hero-filters" role="group" aria-label="Show homes">
-        <button type="button" data-filter="all" aria-pressed="true">All</button><button type="button" data-filter="2" aria-pressed="false">2 BHK</button><button type="button" data-filter="3" aria-pressed="false">3 BHK</button><button type="button" data-filter="4" aria-pressed="false">4 BHK</button>
+    <div class="hero-dock" id="hero-dock" hidden>
+      <div class="hero-ui-buttons">
+        <button type="button" data-tour>Take the tour</button>
+        <button type="button" data-walk>Walk the grounds</button>
+        <button type="button" data-pick aria-expanded="false">Find a flat</button>
+        <button type="button" data-reset hidden>Reset the view</button>
+      </div>
+      <div class="hero-tools">
+        <span class="hero-presets" role="group" aria-label="Time of day"><button type="button" data-time-set="15" aria-pressed="false">Day</button><button type="button" data-time-set="60" aria-pressed="false">Evening</button><button type="button" data-time-set="100" aria-pressed="true">Dusk</button></span>
+        <label class="hero-time"><span>Time of day</span><input type="range" min="0" max="100" value="100" data-time aria-label="Time of day, afternoon to dusk"></label>
+        <div class="hero-filters" role="group" aria-label="Show homes">
+          <button type="button" data-filter="all" aria-pressed="true">All</button><button type="button" data-filter="2" aria-pressed="false">2 BHK</button><button type="button" data-filter="3" aria-pressed="false">3 BHK</button><button type="button" data-filter="4" aria-pressed="false">4 BHK</button>
+        </div>
       </div>
     </div>
-    <p class="hero-caption" data-caption hidden></p>
-    <div class="hero-dpad" data-dpad hidden aria-label="Walk">
-      <button type="button" data-key="w" aria-label="Forward">↑</button><button type="button" data-key="a" aria-label="Left">←</button><button type="button" data-key="s" aria-label="Back">↓</button><button type="button" data-key="d" aria-label="Right">→</button>
-    </div>
-    <span class="hero-tip" data-tip hidden></span>
-  </div>
-  <div class="hero-pick" id="hero-pick" hidden>
-    <button type="button" class="pick-close" data-close>Close</button>
-    <h2 data-where>Pick a flat</h2>
-    <p class="pick-type" data-type>Click any flat on the towers, or choose one here.</p>
-    <p class="pick-facts" data-facts></p>
-    <div class="pick-actions"><a class="button ink" data-open href="./flat.html">Open it in 3D</a></div>
-    <form method="get" action="./flat.html">
-      <div class="form-grid three">
-        <div><label class="label" for="hp-block">Block</label><select class="field" id="hp-block" name="block"><option>A</option><option>B</option><option>C</option></select></div>
-        <div><label class="label" for="hp-floor">Floor</label><select class="field" id="hp-floor" name="floor"><option>1</option><option>2</option><option>3</option><option>4</option><option selected>5</option><option>6</option><option>7</option><option>8</option><option>9</option></select></div>
-        <div><label class="label" for="hp-flat">Flat</label><select class="field" id="hp-flat" name="flat"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option></select></div>
-      </div>
-      <p><button class="button ink wide" type="submit">Show it</button></p>
-    </form>
-  </div>
   </div>
 </section>
 

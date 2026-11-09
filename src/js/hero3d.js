@@ -11,6 +11,9 @@
 // The plot inside the wall is drawn here first, then replaced by the model built in Blender (blender/build_site.py,
 // exported as assets/models/ratan-galaxy.glb with Draco) as soon as it arrives: the same plan, the same block positions,
 // one box per home with a _flat attribute and a colour attribute so a home can still be picked and painted.
+// The stage opens on the architectural overview: an orthographic, isometric view of the plot as a model on a dark slab at
+// dusk, the selected unit on a card at the bottom left and the button that opens its flat at the bottom right. The walk
+// and the tour switch to the perspective camera and bring back the country round the plot.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -95,6 +98,9 @@ async function init() {
   const scene = new THREE.Scene();
   const plot = new THREE.Group(); scene.add(plot); // everything inside the wall, and the gate: drawn here, replaced by the Blender model when it loads
   const camera = new THREE.PerspectiveCamera(42, 1, 0.3, 1400);
+  const iso = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 1600); // the overview has no perspective: the plot drawn as an isometric model
+  let cam = iso; // the overview and the orbit look through iso, the walk and the tour through the perspective camera
+  const country = new THREE.Group(); scene.add(country); // the land, the roads and the sky round the plot: shown on the walk and the tour, not round the model
   const dummy = new THREE.Object3D();
   const tmpColor = new THREE.Color();
   let seed = 11;
@@ -107,7 +113,7 @@ async function init() {
 
   // ---------- the picture: the scene in linear light, a glow off anything brighter than white (the sun, the lit windows and the lamps at dusk), a vignette, then the tone mapping ----------
   const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 0 }));
-  composer.addPass(new RenderPass(scene, camera));
+  const renderPass = new RenderPass(scene, iso); composer.addPass(renderPass);
   const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), phone ? 0.3 : 0.42, 0.4, 1.4); composer.addPass(bloom);
   const bloomSize = bloom.setSize.bind(bloom); bloom.setSize = (w, h) => bloomSize(w / 2, h / 2); // the glow is soft anyway: blur it at half size
   const vignette = new ShaderPass(VignetteShader); vignette.uniforms.offset.value = 0.95; vignette.uniforms.darkness.value = 0.8; composer.addPass(vignette);
@@ -147,9 +153,21 @@ async function init() {
   loader.set(34, 'Laying the ground and the roads'); await frame();
   // ---------- the ground: flat Lucknow country, the plot paved inside its wall ----------
   const ground = new THREE.Mesh(new THREE.PlaneGeometry(1600, 1600), new THREE.MeshStandardMaterial({ map: grassTex, roughness: 1 }));
-  ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+  ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; country.add(ground);
   const paving = new THREE.Mesh(new THREE.PlaneGeometry(239, 69), new THREE.MeshStandardMaterial({ map: pavingTex, roughness: 1 }));
   paving.rotation.x = -Math.PI / 2; paving.position.y = 0.06; paving.receiveShadow = true; plot.add(paving);
+  // the overview: the plot stands on a dark slab like a model on its base, in front of a backdrop lit like the evening sky
+  const slab = new THREE.Mesh(new THREE.BoxGeometry(246, 6, 76), new THREE.MeshStandardMaterial({ color: '#211d19', roughness: 1 }));
+  slab.position.y = -2.98; slab.receiveShadow = true; scene.add(slab);
+  const backdropUniforms = { top: { value: new THREE.Color() }, glow: { value: new THREE.Color() }, base: { value: new THREE.Color() } };
+  const backdrop = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({
+    uniforms: backdropUniforms, depthTest: false, depthWrite: false, fog: false,
+    vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+    fragmentShader: `uniform vec3 top; uniform vec3 glow; uniform vec3 base; varying vec2 vUv;
+      void main() { vec3 c = mix(glow, top, smoothstep(0.52, 1.0, vUv.y)); c = mix(base, c, smoothstep(0.1, 0.52, vUv.y));
+        float side = smoothstep(0.5, 0.16, abs(vUv.x - 0.5)); c = mix(base, c, 0.3 + 0.7 * side); gl_FragColor = vec4(c, 1.0); }`,
+  }));
+  backdrop.frustumCulled = false; backdrop.renderOrder = -2; scene.add(backdrop);
 
   const flat = (geo, color, x, z, y = 0.1, rot = 0, extra = {}, parent = plot) => { const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color, roughness: 1, ...extra })); m.rotation.x = -Math.PI / 2; m.rotation.z = rot; m.position.set(x, y, z); m.receiveShadow = true; parent.add(m); return m; };
   [[-72, -24, 18, 9], [34, -24, 18, 9], [-72, 25, 18, 9], [34, 25, 18, 9], [-50, 2, 10, 20], [8, 2, 10, 20]].forEach(([x, z, w, h]) => flat(new THREE.PlaneGeometry(w, h), '#ffffff', x, z, 0.12, 0, { map: lawnTex }));
@@ -159,15 +177,15 @@ async function init() {
   flat(new THREE.PlaneGeometry(20, 56), '#f2f7ea', -110, 0, 0.1, 0, { map: stripTex }); // and the strip at the west end
 
   // roads: the south road the gate opens on, and the ones down both sides
-  flat(new THREE.PlaneGeometry(300, 14), '#ffffff', 0, 43, 0.04, 0, { map: asphaltTex }, scene);
+  flat(new THREE.PlaneGeometry(300, 14), '#ffffff', 0, 43, 0.04, 0, { map: asphaltTex }, country);
   const sideTex = asphaltTex.clone(); sideTex.repeat.set(2, 24); sideTex.needsUpdate = true;
-  flat(new THREE.PlaneGeometry(14, 160), '#ffffff', -129, 0, 0.04, 0, { map: sideTex }, scene);
-  flat(new THREE.PlaneGeometry(14, 160), '#ffffff', 129, 0, 0.04, 0, { map: sideTex }, scene);
+  flat(new THREE.PlaneGeometry(14, 160), '#ffffff', -129, 0, 0.04, 0, { map: sideTex }, country);
+  flat(new THREE.PlaneGeometry(14, 160), '#ffffff', 129, 0, 0.04, 0, { map: sideTex }, country);
   const dashes = new THREE.InstancedMesh(new THREE.PlaneGeometry(3, 0.2), new THREE.MeshStandardMaterial({ color: '#d8c35e', roughness: 1 }), 50);
   for (let i = 0; i < 50; i++) { dummy.position.set(-147 + i * 6, 0.05, 43); dummy.rotation.set(-Math.PI / 2, 0, 0); dummy.scale.set(1, 1, 1); dummy.updateMatrix(); dashes.setMatrixAt(i, dummy.matrix); }
-  scene.add(dashes);
-  flat(new THREE.PlaneGeometry(300, 3), '#b9b3a9', 0, 51.5, 0.05, 0, {}, scene); // the footpath across the road
-  flat(new THREE.PlaneGeometry(300, 0.3), '#8a8580', 0, 50, 0.06, 0, {}, scene); // its kerb
+  country.add(dashes);
+  flat(new THREE.PlaneGeometry(300, 3), '#b9b3a9', 0, 51.5, 0.05, 0, {}, country); // the footpath across the road
+  flat(new THREE.PlaneGeometry(300, 0.3), '#8a8580', 0, 50, 0.06, 0, {}, country); // its kerb
   flat(new THREE.PlaneGeometry(240, 2.5), '#b9b3a9', 0, 34.5, 0.07); // and the one along the wall
 
   // the parking row inside the south wall, white lines and a few cars
@@ -253,7 +271,7 @@ async function init() {
     spots.forEach(([x, z], i) => { dummy.position.set(x, 3, z); dummy.rotation.set(0, 0, 0); dummy.scale.set(1, 1, 1); dummy.updateMatrix(); posts.setMatrixAt(i, dummy.matrix); dummy.position.set(x, 6.1, z); dummy.updateMatrix(); heads.setMatrixAt(i, dummy.matrix); });
     posts.castShadow = shadows; parent.add(posts, heads);
   };
-  lampRow(roadLamps, scene); lampRow(plotLamps, plot);
+  lampRow(roadLamps, country); lampRow(plotLamps, plot);
 
   loader.set(52, 'Raising the three blocks'); await frame();
   // ---------- the three blocks ----------
@@ -264,6 +282,7 @@ async function init() {
   const railMat = new THREE.MeshStandardMaterial({ map: railTex, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.6, metalness: 0.4 });
   const frameMat = new THREE.MeshStandardMaterial({ color: '#2f2d2b', roughness: 0.7 });
   const acMat = new THREE.MeshStandardMaterial({ color: '#d9d9d6', roughness: 0.7, metalness: 0.2 });
+  let glassDark = null, clubGlow = null; // in the Blender model: the windows that stay dark, and the club's glazing
   let glass = new THREE.MeshStandardMaterial({ color: '#a9c0d2', emissive: '#ffb860', emissiveIntensity: 0, roughness: 0.12, metalness: 0.65, envMapIntensity: 1.1 });
   const blockPos = { C: [-78, 2], B: [-19, 1], A: [40, 2] };
   let records = []; // one per box, in instance order; the Blender model's list once it loads
@@ -377,7 +396,7 @@ async function init() {
     crown.castShadow = crown2.castShadow = shadows; parent.add(crown, crown2, trunk);
   };
   const inside = phone ? 60 : 110;
-  forest(spots.slice(0, inside), plot); forest(spots.slice(inside), scene);
+  forest(spots.slice(0, inside), plot); forest(spots.slice(inside), country);
   spots.slice(0, inside).forEach(([x, z]) => solids.push({ x, z, rot: 0, hl: 0.5, hw: 0.5 }));
 
   // ---------- the neighbourhood: low blocks across the roads, so the towers stand in a city ----------
@@ -392,7 +411,7 @@ async function init() {
     dummy.position.set(x, (fl * 3.2) / 2, z); dummy.scale.set(w, fl * 3.2, d); dummy.rotation.set(0, rnd() < 0.5 ? 0 : Math.PI / 2, 0); dummy.updateMatrix();
     hoods.setMatrixAt(h, dummy.matrix); hoods.setColorAt(h, tmpColor.set(hoodColours[h % hoodColours.length])); h++;
   }
-  hoods.count = h; hoods.castShadow = shadows; hoods.receiveShadow = true; scene.add(hoods);
+  hoods.count = h; hoods.castShadow = shadows; hoods.receiveShadow = true; country.add(hoods);
 
   // ---------- the sky: a dome with a haze at the horizon and the sun in it, a few clouds ----------
   const skyUniforms = { top: { value: new THREE.Color('#3b78c6') }, horizon: { value: new THREE.Color('#ecdfc4') }, sunDir: { value: new THREE.Vector3(0, 1, 0) }, sunColor: { value: new THREE.Color('#ffd79a') } };
@@ -403,13 +422,13 @@ async function init() {
       void main() { vec3 d = normalize(vDir); float t = pow(clamp(d.y, 0.0, 1.0), 0.45); vec3 c = mix(horizon, top, t);
         float s = max(dot(d, normalize(sunDir)), 0.0); c += sunColor * (pow(s, 4.0) * 0.25 + pow(s, 48.0) * 0.8 + pow(s, 900.0) * 3.0); gl_FragColor = vec4(c, 1.0); }`,
   }));
-  sky.renderOrder = -1; scene.add(sky);
+  sky.renderOrder = -1; country.add(sky);
   const cloudMat = new THREE.MeshStandardMaterial({ color: '#fff8ee', roughness: 1 });
   const puff = new THREE.SphereGeometry(1, 10, 7);
   [[-300, 150, -500, 2.2], [100, 170, -560, 2.8], [420, 140, -420, 2], [-520, 130, -200, 1.8], [560, 150, 100, 2.1], [-100, 180, -650, 3]].forEach(([cx, cy, cz, sc]) => {
     const g = new THREE.Group(); g.position.set(cx, cy, cz);
     for (let i = 0; i < 6; i++) { const m = new THREE.Mesh(puff, cloudMat); m.position.set((i - 2.5) * 6 * sc, Math.cos(i * 1.7) * 1.5 * sc, Math.sin(i * 3.3) * 3); m.scale.set((7 + (i % 3) * 2) * sc, (3 + (i % 2)) * sc, (4 + (i % 2)) * sc); g.add(m); }
-    scene.add(g);
+    country.add(g);
   });
 
   loader.set(88, 'Waiting for the afternoon light'); await frame();
@@ -423,26 +442,57 @@ async function init() {
   const day = { top: new THREE.Color('#3b78c6'), horizon: new THREE.Color('#e9e3d6'), sun: new THREE.Color('#ffd9a6'), glow: new THREE.Color('#ffd79a'), hemi: new THREE.Color('#a8c0d8'), fog: new THREE.Color('#dbd6ca'), water: new THREE.Color('#3f9bb4') };
   const dusk = { top: new THREE.Color('#2b2848'), horizon: new THREE.Color('#ee9450'), sun: new THREE.Color('#ff8a3c'), glow: new THREE.Color('#ff9a4a'), hemi: new THREE.Color('#6b4a5a'), fog: new THREE.Color('#6d4a44'), water: new THREE.Color('#b86a44') };
   scene.background = day.horizon.clone();
-  scene.fog = new THREE.Fog(day.fog.clone(), 220, 1100);
+  const fog = new THREE.Fog(day.fog.clone(), 220, 1100);
+  // the model on its slab: no haze, a cooler evening so the towers stand in blue shade against the glow, as on the reference sheet
+  const modelDusk = { hemi: new THREE.Color('#6f88bb'), sun: new THREE.Color('#ffae78'), ground: new THREE.Color('#2b2f38') };
+  const groundMats = []; // the Blender model's paving, parking and paths: they go dark with the light on the slab
+  const backDay = { top: new THREE.Color('#6f93bd'), glow: new THREE.Color('#d9d2c4'), base: new THREE.Color('#1b1815') };
+  const backDusk = { top: new THREE.Color('#262b38'), glow: new THREE.Color('#9c552c'), base: new THREE.Color('#0f0d0b') };
+  let diorama = true;
+  const setDiorama = (on) => { diorama = on; country.visible = !on; slab.visible = backdrop.visible = on; scene.fog = on ? null : fog; };
+  setDiorama(true);
   const setLight = (u) => {
-    const el = THREE.MathUtils.lerp(0.5, 0.08, u), az = THREE.MathUtils.lerp(-0.8, -1.3, u);
+    const el = THREE.MathUtils.lerp(diorama ? 0.62 : 0.5, diorama ? 0.2 : 0.08, u), az = THREE.MathUtils.lerp(-0.8, -1.3, u);
     const dir = new THREE.Vector3(Math.cos(el) * Math.sin(az), Math.sin(el), Math.cos(el) * Math.cos(az));
     sun.position.copy(dir).multiplyScalar(300).add(sun.target.position);
     sun.color.copy(day.sun).lerp(dusk.sun, u); sun.intensity = THREE.MathUtils.lerp(3, 1.5, u);
     hemi.color.copy(day.hemi).lerp(dusk.hemi, u); hemi.intensity = THREE.MathUtils.lerp(0.8, 0.65, u);
     scene.environmentIntensity = THREE.MathUtils.lerp(0.45, 0.25, u);
     skyUniforms.top.value.copy(day.top).lerp(dusk.top, u); skyUniforms.horizon.value.copy(day.horizon).lerp(dusk.horizon, u); skyUniforms.sunColor.value.copy(day.glow).lerp(dusk.glow, u); skyUniforms.sunDir.value.copy(dir);
-    scene.fog.color.copy(day.fog).lerp(dusk.fog, u); scene.background.copy(scene.fog.color);
+    fog.color.copy(day.fog).lerp(dusk.fog, u); scene.background.copy(fog.color);
+    if (diorama) { sun.color.copy(day.sun).lerp(modelDusk.sun, u); sun.intensity = THREE.MathUtils.lerp(3, 0.95, u); hemi.color.copy(day.hemi).lerp(modelDusk.hemi, u); hemi.intensity = THREE.MathUtils.lerp(0.8, 1.05, u); }
+    backdropUniforms.top.value.copy(backDay.top).lerp(backDusk.top, u); backdropUniforms.glow.value.copy(backDay.glow).lerp(backDusk.glow, u); backdropUniforms.base.value.copy(backDay.base).lerp(backDusk.base, u);
     waterMat.color.copy(day.water).lerp(dusk.water, u);
     cloudMat.color.setHex(0xfff8ee).lerp(new THREE.Color('#e08a62'), u);
     const on = THREE.MathUtils.smoothstep(u, 0.45, 0.92);
     glass.emissiveIntensity = on * 2.4; glass.color.setHex(on > 0.2 ? 0xffe6b8 : 0xa9c0d2);
     lampGlow.emissiveIntensity = roadLampGlow.emissiveIntensity = on * 3.4;
+    if (glassDark) glassDark.color.setHex(on > 0.2 ? 0x27303c : 0xa9c0d2);
+    if (clubGlow) clubGlow.emissiveIntensity = on * 1.5;
+    if (diorama) waterMat.color.copy(day.water); // the pool is lit on the model
+    waterMat.emissiveIntensity = diorama ? on * 0.8 : 0;
+    for (const g of groundMats) g.mat.color.copy(g.base).lerp(modelDusk.ground, diorama ? on * 0.8 : 0);
   };
 
-  // ---------- the camera: the approach on scroll, free orbit, the walk, the tour ----------
-  const camPath = new THREE.CatmullRomCurve3([new THREE.Vector3(150, 78, 150), new THREE.Vector3(98, 46, 104), new THREE.Vector3(64, 28, 62), new THREE.Vector3(58, 20, 44)]);
-  const lookFrom = new THREE.Vector3(-8, 10, 0), lookTo = new THREE.Vector3(38, 15, 4);
+  // ---------- the camera: the isometric overview, free orbit round it, the walk, the tour ----------
+  // the overview looks down the true isometric angle from the south-east (from the east end on a tall screen, where the
+  // long plot would otherwise be a thin strip), with the whole slab in frame
+  const ISO_EL = Math.atan(Math.SQRT1_2), ISO_DIST = 600;
+  const isoCentre = new THREE.Vector3(0, 15, 0), isoDir = new THREE.Vector3(), isoCorner = new THREE.Vector3(), isoInverse = new THREE.Matrix4();
+  let isoAz = Math.PI / 4, isoNow = isoAz, isoHeight = 170; // the bearing the overview rests at, where it is now, and the metres it shows top to bottom
+  const isoAim = (az) => { isoDir.set(Math.cos(ISO_EL) * Math.sin(az), Math.sin(ISO_EL), Math.cos(ISO_EL) * Math.cos(az)); iso.position.copy(isoCentre).addScaledVector(isoDir, ISO_DIST); iso.lookAt(isoCentre); };
+  const fitIso = (aspect) => {
+    isoAz = aspect < 1 ? 1.22 : Math.PI / 4;
+    const at = iso.position.clone(), turned = iso.quaternion.clone();
+    isoAim(isoAz); iso.updateMatrixWorld(); isoInverse.copy(iso.matrixWorld).invert();
+    let hw = 0, hh = 0;
+    for (const x of [-123, 123]) for (const y of [-6, 36]) for (const z of [-38, 38]) { isoCorner.set(x, y, z).applyMatrix4(isoInverse); hw = Math.max(hw, Math.abs(isoCorner.x)); hh = Math.max(hh, Math.abs(isoCorner.y)); }
+    isoHeight = Math.max(hh * 2, (hw * 2) / aspect) * (aspect < 1 ? 1.04 : 0.96);
+    const drop = aspect < 1 ? 0 : isoHeight * 0.07;
+    iso.left = (-isoHeight * aspect) / 2; iso.right = -iso.left; iso.top = isoHeight / 2 - drop; iso.bottom = -isoHeight / 2 - drop; iso.updateProjectionMatrix();
+    iso.position.copy(at); iso.quaternion.copy(turned);
+  };
+  const eyeFromIso = (out) => out.copy(look).addScaledVector(isoDir.subVectors(iso.position, look).normalize(), isoHeight / iso.zoom / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)))); // where the perspective camera sees what the overview shows
   const camPos = new THREE.Vector3(), camTarget = new THREE.Vector3(), look = new THREE.Vector3(), lookTarget = new THREE.Vector3();
   let progress = 0, mouseX = 0, mouseY = 0, px = 0, py = 0;
   let mode = 'approach'; // approach | orbit | walk | tour
@@ -453,15 +503,16 @@ async function init() {
     addEventListener('pointermove', (e) => { mouseX = (e.clientX / innerWidth) * 2 - 1; mouseY = (e.clientY / innerHeight) * 2 - 1; }, { passive: true });
     hero.addEventListener('pointerleave', () => { mouseX = 0; mouseY = 0; });
   }
-  const ui = document.getElementById('hero-ui');
-  const q = (sel) => ui?.querySelector(sel);
+  const ui = document.getElementById('hero-ui'), dock = document.getElementById('hero-dock');
+  const q = (sel) => hero.querySelector(sel);
+  const viewTag = q('[data-view]');
   const tourBtn = q('[data-tour]'), walkBtn = q('[data-walk]'), resetBtn = q('[data-reset]'), caption = q('[data-caption]'), tip = q('[data-tip]'), dpad = q('[data-dpad]'), timeInput = q('[data-time]');
   const say = (text) => { if (!caption) return; caption.textContent = text; caption.hidden = !text; };
 
-  const controls = new OrbitControls(camera, canvas);
+  const controls = new OrbitControls(iso, canvas);
   controls.enableDamping = true; controls.dampingFactor = 0.08; controls.enablePan = !phone; controls.screenSpacePanning = false;
-  controls.minDistance = 12; controls.maxDistance = 420; controls.maxPolarAngle = Math.PI / 2 - 0.04; controls.minPolarAngle = 0.15;
-  controls.enableZoom = false; controls.target.set(0, 12, 0);
+  controls.minZoom = 0.7; controls.maxZoom = 7; controls.maxPolarAngle = Math.PI / 2 - 0.04; controls.minPolarAngle = 0.15;
+  controls.enableZoom = false; controls.target.copy(isoCentre);
   canvas.style.touchAction = 'pan-y';
   let pointerDown = false;
   controls.addEventListener('change', () => { if (mode === 'approach' && pointerDown) setMode('orbit'); });
@@ -526,15 +577,21 @@ async function init() {
   };
 
   const hints = {
-    approach: '',
+    approach: coarse ? 'Drag to turn the model. Tap a home to select it.' : 'Drag to turn the model. Click a home to select it, or the gate to walk in.',
     orbit: coarse ? 'Drag to turn round the site, pinch to zoom. Tap a home to open it.' : 'Drag to turn round the site, scroll to zoom, right drag to slide. Click a home to open it.',
     walk: coarse ? 'You are at the gate. Drag to look round, the pad walks you.' : 'You are at the gate. Drag to look round, W A S D or the arrows walk you.',
   };
   const setMode = (m) => {
     const was = mode; mode = m;
     tour.on = m === 'tour';
-    if (tourBtn) tourBtn.textContent = tour.on ? 'Stop the tour' : 'Take the tour';
-    if (walkBtn) walkBtn.textContent = m === 'walk' ? 'Stop walking' : 'Walk the grounds';
+    if (tourBtn) { tourBtn.textContent = tour.on ? 'Stop the tour' : 'Take the tour'; tourBtn.setAttribute('aria-pressed', String(tour.on)); }
+    if (walkBtn) { walkBtn.textContent = m === 'walk' ? 'Stop walking' : 'Walk the grounds'; walkBtn.setAttribute('aria-pressed', String(m === 'walk')); }
+    const persp = m === 'walk' || m === 'tour';
+    hero.dataset.mode = m; // the card and the launch button belong to the overview: the stylesheet takes them off the walk and the tour
+    if (m === 'tour' && cam === iso) { eyeFromIso(tour.from); camPos.copy(tour.from); } else if (m === 'tour') tour.from.copy(camPos);
+    cam = persp ? camera : iso; renderPass.camera = cam; if (diorama === persp) setDiorama(!persp);
+    if (m === 'approach') { iso.zoom = 1; iso.updateProjectionMatrix(); isoNow = isoAz; }
+    if (viewTag) viewTag.textContent = m === 'walk' ? 'Walk · Eye level' : m === 'tour' ? 'Tour · Perspective' : 'Iso kit · Orthographic';
     if (resetBtn) resetBtn.hidden = m === 'approach';
     if (dpad) dpad.hidden = !(m === 'walk' && coarse);
     controls.enabled = m === 'orbit' || m === 'approach';
@@ -543,7 +600,7 @@ async function init() {
     canvas.tabIndex = m === 'walk' ? 0 : -1;
     if (m === 'orbit') { controls.target.copy(look); controls.update(); }
     if (m === 'walk') { if (was !== 'walk') { walker.pos.set(12, 1.75, 44); walker.yaw = 0; walker.pitch = 0.02; } canvas.focus({ preventScroll: true }); }
-    if (m === 'tour') { tour.i = 0; tour.t = 0; tour.from.copy(camPos); tour.fromLook.copy(look); say(stops[0].text); } else say(hints[m] || '');
+    if (m === 'tour') { tour.i = 0; tour.t = 0; tour.fromLook.copy(look); say(stops[0].text); } else say(hints[m] || '');
     keys.clear(); start();
   };
   tourBtn?.addEventListener('click', () => setMode(tour.on ? 'approach' : 'tour'));
@@ -556,17 +613,17 @@ async function init() {
       walkStep(dt); camPos.copy(walker.pos);
       camera.position.copy(camPos); camera.rotation.order = 'YXZ'; camera.rotation.set(-walker.pitch, walker.yaw, 0);
       look.copy(camPos).add(new THREE.Vector3(-Math.sin(walker.yaw) * 10, 0, -Math.cos(walker.yaw) * 10));
-    } else if (mode === 'orbit') { controls.update(); camPos.copy(camera.position); look.copy(controls.target); }
-    else {
-      camPath.getPointAt(progress, camTarget); camTarget.x += px * 3; camTarget.y += -py * 1.5;
-      lookTarget.copy(lookFrom).lerp(lookTo, progress); lookTarget.x += px * 2; lookTarget.y += -py * 0.8;
-      if (immediate) { camPos.copy(camTarget); look.copy(lookTarget); } else { camPos.lerp(camTarget, 0.07); look.lerp(lookTarget, 0.07); }
-      camera.position.copy(camPos); camera.lookAt(look);
+    } else if (mode === 'orbit') { controls.update(); camPos.copy(iso.position); look.copy(controls.target); }
+    else { // the overview: it turns a little with the pointer and as the page scrolls past
+      const az = isoAz + (reduced ? 0 : px * 0.05 + (progress - 0.5) * 0.28);
+      isoNow = immediate ? az : THREE.MathUtils.damp(isoNow, az, 4, dt);
+      isoAim(isoNow); camPos.copy(iso.position); look.copy(isoCentre);
     }
-    sky.position.copy(camera.position);
+    sky.position.copy(cam.position);
   };
 
   // ---------- picking a home: hover names it, click opens the card; the filters pick out a size ----------
+  const unitNo = (r) => r.floor * 100 + r.flat; // floor 5, flat 2 is unit 502
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2(-2, -2);
   const gold = new THREE.Color('#d9b263'), goldHot = new THREE.Color('#f0c766'), dim = new THREE.Color('#9f978c');
@@ -575,36 +632,52 @@ async function init() {
     pick: (rc) => { const hit = rc.intersectObject(flats, false)[0]; return hit && records[hit.instanceId]?.home ? hit.instanceId : -1; },
     paint: (i, c) => { flats.setColorAt(i, c); flats.instanceColor.needsUpdate = true; },
     base: (i) => flatColours[i],
+    edges: (i) => new THREE.EdgesGeometry(new THREE.BoxGeometry(1, 1, 1)).applyMatrix4(flatMatrices[i]),
   };
+  const marker = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: '#ffd24a', depthTest: false, transparent: true, fog: false }));
+  marker.renderOrder = 10; marker.frustumCulled = false; marker.visible = false; scene.add(marker);
+  const mark = (i) => { marker.visible = i >= 0; if (i >= 0) { marker.geometry.dispose(); marker.geometry = homes.edges(i); } };
   const shown = (i) => filter === 'all' || !records[i].home || (records[i].type && records[i].type.startsWith(filter));
   const paint = (i) => { if (i < 0 || i >= records.length) return; homes.paint(i, i === selected ? goldHot : i === hovered ? gold : shown(i) ? homes.base(i) : dim); };
   const setHover = (i) => {
     if (i === hovered) return;
     const old = hovered; hovered = i; paint(old); paint(i); canvas.style.cursor = i >= 0 ? 'pointer' : '';
-    if (tip) { if (i >= 0) { const r = records[i]; tip.textContent = `Block ${r.block} · ${ordinal(r.floor)} floor · flat ${r.flat} · ${PLANS[r.type]?.name || ''}`; tip.hidden = false; } else tip.hidden = true; }
+    if (tip) { if (i >= 0) { const r = records[i]; tip.textContent = `Unit ${unitNo(r)} · Block ${r.block} · ${PLANS[r.type]?.name || ''}`; tip.hidden = false; } else tip.hidden = true; }
   };
   let overGate = false;
   const pickAt = () => {
-    raycaster.setFromCamera(pointer, camera);
+    raycaster.setFromCamera(pointer, cam);
     const i = homes.pick(raycaster);
     setHover(i);
     overGate = i < 0 && mode !== 'walk' && raycaster.intersectObjects(gateParts, false).length > 0; // the gate: a click walks you in
     if (overGate) { canvas.style.cursor = 'pointer'; if (tip) { tip.textContent = 'Walk in at the gate'; tip.hidden = false; } }
     return i;
   };
-  const setFilter = (f) => { filter = f; for (let i = 0; i < records.length; i++) paint(i); ui?.querySelectorAll('[data-filter]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === f))); start(); };
-  ui?.querySelectorAll('[data-filter]').forEach((b) => b.addEventListener('click', () => setFilter(b.dataset.filter)));
-  const card = document.getElementById('hero-pick');
+  const setFilter = (f) => { filter = f; for (let i = 0; i < records.length; i++) paint(i); hero.querySelectorAll('[data-filter]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === f))); start(); };
+  hero.querySelectorAll('[data-filter]').forEach((b) => b.addEventListener('click', () => setFilter(b.dataset.filter)));
+  const card = document.getElementById('hero-pick'), launch = q('[data-launch]'), findBtn = q('[data-pick]'), findForm = card?.querySelector('[data-find]');
+  let chosen = { block: 'B', floor: 5, flat: 2 }; // the unit on the card: this one until a home is clicked
   const showCard = (rec) => {
-    if (!card) return;
     const plan = PLANS[rec.type];
-    card.querySelector('[data-where]').textContent = `Block ${rec.block} · ${ordinal(rec.floor)} floor · flat ${rec.flat}`;
-    card.querySelector('[data-type]').textContent = plan.name;
-    card.querySelector('[data-facts]').textContent = `${plan.superArea.toLocaleString('en-IN')} sq ft super, ${plan.carpet} carpet · sample price ${plan.priceText}`;
-    card.querySelector('[data-open]').href = `/flat.html?block=${rec.block}&floor=${rec.floor}&flat=${rec.flat}`;
-    const form = card.querySelector('form');
-    if (form) { form.elements.block.value = rec.block; form.elements.floor.value = rec.floor; form.elements.flat.value = rec.flat; }
+    if (!card || !plan) return;
+    chosen = { block: rec.block, floor: rec.floor, flat: rec.flat };
+    const area = rec.block === 'B' && rec.flat !== 6 && rec.flat !== 13 ? 1100 : plan.superArea; // Block B: 994 sq ft at flats 6 and 13, 1,100 at the other twelve
+    const href = `/flat.html?block=${rec.block}&floor=${rec.floor}&flat=${rec.flat}`;
+    card.querySelector('[data-where]').textContent = `Unit ${unitNo(rec)} · Block ${rec.block}`;
+    card.querySelector('[data-type]').textContent = `${plan.name} · ${area.toLocaleString('en-IN')} sq ft super area · ${plan.carpet} carpet · ${ordinal(rec.floor)} floor, flat ${rec.flat}`;
+    const price = card.querySelector('[data-price]'), note = document.createElement('small');
+    note.textContent = 'sample price'; price.textContent = plan.priceText; price.append(note);
+    card.querySelector('[data-open]').href = href;
+    if (launch) { launch.href = href; launch.hidden = false; }
+    if (findForm) { findForm.elements.block.value = rec.block; findForm.elements.floor.value = rec.floor; findForm.elements.flat.value = rec.flat; }
     card.hidden = false;
+  };
+  const choose = ({ block, floor, flat }) => { // by block, floor and number: paint it and put it on the card
+    const type = flatType(block, flat);
+    if (!type) return;
+    const i = records.findIndex((r) => r.home && r.block === block && r.floor === floor && r.flat === flat);
+    const old = selected; selected = i; paint(old); paint(i); mark(i);
+    showCard({ block, floor, flat, type });
   };
   const setPointer = (e) => { const r = canvas.getBoundingClientRect(); pointer.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); if (tip) tip.style.transform = `translate(${e.clientX - r.left + 14}px, ${e.clientY - r.top + 18}px)`; };
   canvas.addEventListener('pointermove', (e) => {
@@ -620,8 +693,9 @@ async function init() {
     downAt = null; setPointer(e);
     const i = pickAt();
     if (i < 0 && overGate) { setMode('walk'); return; }
-    const old = selected; selected = i; paint(old); paint(i);
-    if (i >= 0) showCard(records[i]);
+    if (i < 0) return; // a click on nothing keeps the unit on the card
+    const old = selected; selected = i; paint(old); paint(i); mark(i);
+    showCard(records[i]);
   };
   canvas.addEventListener('pointerup', endPointer); canvas.addEventListener('pointercancel', () => { pointerDown = false; looking = null; downAt = null; });
   card?.querySelector('[data-close]')?.addEventListener('click', () => { card.hidden = true; const old = selected; selected = -1; paint(old); });
@@ -629,16 +703,14 @@ async function init() {
   card?.querySelector('form')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const f = e.target.elements, block = f.block.value, floor = Number(f.floor.value), flat = Number(f.flat.value);
-    const type = flatType(block, flat);
-    if (!type) return;
-    const i = records.findIndex((r) => r.block === block && r.floor === floor && r.flat === flat);
-    const old = selected; selected = i; paint(old); paint(i);
-    showCard({ block, floor, flat, type });
+    choose({ block, floor, flat });
+    if (findForm) findForm.hidden = true; findBtn?.setAttribute('aria-expanded', 'false'); start();
   });
-  q('[data-pick]')?.addEventListener('click', () => { if (card) { card.hidden = !card.hidden; if (!card.hidden) card.querySelector('select')?.focus(); } });
+  findBtn?.addEventListener('click', () => { if (!findForm) return; findForm.hidden = !findForm.hidden; findBtn.setAttribute('aria-expanded', String(!findForm.hidden)); if (!findForm.hidden) findForm.querySelector('select')?.focus(); });
+  choose(chosen);
 
   // the time of day: runs on its own until the slider is touched
-  let manualLight = null;
+  let manualLight = 1; // the overview opens at dusk, as the reference sheet is lit; the slider and the presets change it
   timeInput?.addEventListener('input', () => { manualLight = Number(timeInput.value) / 100; start(); pressPreset(); });
   const presets = Array.from(document.querySelectorAll('[data-time-set]'));
   const pressPreset = () => { const v = manualLight === null ? null : Math.round(manualLight * 100); presets.forEach((b) => b.setAttribute('aria-pressed', String(v !== null && Math.abs(Number(b.dataset.timeSet) - v) < 8))); };
@@ -651,6 +723,7 @@ async function init() {
     renderer.setSize(w, h, false); composer.setSize(w, h);
     const pr = renderer.getPixelRatio(); fxaa.uniforms.resolution.value.set(1 / (w * pr), 1 / (h * pr));
     camera.aspect = w / h; camera.fov = mode === 'walk' ? (w < h ? 80 : 66) : (w < h ? 60 : 42); camera.updateProjectionMatrix();
+    fitIso(w / h);
   };
   new ResizeObserver(() => { resize(); if (reduced) renderOnce(); }).observe(stage);
   resize();
@@ -671,7 +744,7 @@ async function init() {
     if (pickDirty) { pickDirty = false; pickAt(); }
     composer.render(dt);
     if (started && !eased) { slowFrames = dt > 0.034 ? slowFrames + 1 : Math.max(0, slowFrames - 1); if (slowFrames > 45) easeOff(); }
-    if (!started) { started = true; hero.classList.add('is-3d'); if (ui) ui.hidden = false; loader.done(); }
+    if (!started) { started = true; hero.classList.add('is-3d'); if (ui) ui.hidden = false; if (dock) dock.hidden = false; say(hints[mode] || ''); loader.done(); }
   };
   const loop = () => { raf = 0; if (!visible || document.hidden) return; render(); raf = requestAnimationFrame(loop); };
   const start = () => { if (!raf && visible && !document.hidden && (!reduced || mode !== 'approach')) raf = requestAnimationFrame(loop); };
@@ -695,9 +768,10 @@ async function init() {
         if (!o.isMesh) return;
         byName[o.name] = o; o.castShadow = o.receiveShadow = shadows;
         const m = o.material;
-        if (m.name === 'glass') glbGlass = m; else if (m.name === 'water') glbWater = m; else if (m.name === 'lamp_glow') glbLamp = m;
-        if (!m.transparent && m.name !== 'glass') m.side = THREE.FrontSide;
-        if (m.name === 'glass' || m.name === 'club_glass' || m.name === 'water') m.envMapIntensity = 1.2;
+        if (m.name === 'glass') glbGlass = m; else if (m.name === 'water') glbWater = m; else if (m.name === 'lamp_glow') glbLamp = m; else if (m.name === 'glass_dark') glassDark = m; else if (m.name === 'club_glass') { clubGlow = m; m.emissive.set('#ffb860'); }
+        if (['paving', 'parking', 'footpath', 'deck'].includes(m.name) && !groundMats.some((g) => g.mat === m)) groundMats.push({ mat: m, base: m.color.clone() });
+        if (!m.transparent && !m.name.startsWith('glass')) m.side = THREE.FrontSide;
+        if (m.name.startsWith('glass') || m.name === 'club_glass' || m.name === 'water') m.envMapIntensity = 1.2;
         if (o.geometry.attributes._flat) flatMeshes.push(o);
       });
       if (!flatMeshes.length) return;
@@ -716,14 +790,20 @@ async function init() {
         pick: (rc) => { const hit = rc.intersectObjects(flatMeshes, false)[0]; if (!hit) return -1; const p = hit.object.userData.part; return p.offset + Math.round(hit.object.geometry.attributes._flat.getX(hit.face.a)); },
         paint: (i, c) => { const p = partOf(i); for (const v of p.verts[i - p.offset] || []) p.col.setXYZ(v, c.r, c.g, c.b); p.col.needsUpdate = true; },
         base: (i) => { const p = partOf(i); return p.base[i - p.offset]; },
+        edges: (i) => { // the box of one home, cut out of its block's mesh
+          const p = partOf(i), id = i - p.offset, g = p.mesh.geometry, pos = g.attributes.position, ids = g.attributes._flat, index = g.index, out = [];
+          for (let t = 0; t < index.count; t += 3) { if (Math.round(ids.getX(index.getX(t))) !== id) continue; for (let k = 0; k < 3; k++) { const v = index.getX(t + k); out.push(pos.getX(v), pos.getY(v), pos.getZ(v)); } }
+          const box = new THREE.BufferGeometry(); box.setAttribute('position', new THREE.Float32BufferAttribute(out, 3));
+          const lines = new THREE.EdgesGeometry(box, 30).applyMatrix4(p.mesh.matrixWorld); box.dispose(); return lines;
+        },
       };
-      const oldSel = selected; setHover(-1); selected = -1; paint(oldSel);
+      const oldSel = selected; setHover(-1); selected = -1; paint(oldSel); mark(-1);
       records = list; homes = glbHomes;
       gateParts = ['gate_pillars', 'gate_beam', 'gate_cornice', 'gate_board', 'gate_name', 'gate_sub'].map((n) => byName[n]).filter(Boolean);
-      if (glbGlass) glass = glbGlass; if (glbWater) waterMat = glbWater; if (glbLamp) lampGlow = glbLamp;
+      if (glbGlass) glass = glbGlass; if (glbWater) { waterMat = glbWater; waterMat.emissive.set('#1f9fc0'); } if (glbLamp) lampGlow = glbLamp;
       scene.remove(plot); plot.traverse((o) => { if (o.isMesh) o.geometry.dispose(); });
-      scene.add(model);
-      setFilter(filter);
+      scene.add(model); model.updateMatrixWorld(true);
+      setFilter(filter); choose(chosen);
       if (reduced) renderOnce(); else start();
     }, undefined, () => {}); // the drawn plot stays if the model cannot be fetched
   };
@@ -732,10 +812,10 @@ async function init() {
   // a still of the scene, for the static fallback picture and the social image
   window.__heroSnapshot = (w = 1600, h = 900, light = 0.15, at = 0.3) => {
     const prevRatio = renderer.getPixelRatio(); renderer.setPixelRatio(1); composer.setPixelRatio(1); renderer.setSize(w, h, false); composer.setSize(w, h);
-    camera.aspect = w / h; camera.fov = w < h ? 60 : 42; camera.updateProjectionMatrix();
-    const saved = progress, savedMode = mode; mode = 'approach'; progress = at; px = 0; py = 0; placeCamera(true, 0); setLight(light); composer.render();
+    camera.aspect = w / h; camera.fov = w < h ? 60 : 42; camera.updateProjectionMatrix(); fitIso(w / h);
+    const saved = progress, savedMode = mode; mode = 'approach'; cam = iso; renderPass.camera = iso; setDiorama(true); progress = at; px = 0; py = 0; placeCamera(true, 0); setLight(light); composer.render();
     const data = canvas.toDataURL('image/jpeg', 0.86);
-    progress = saved; mode = savedMode; renderer.setPixelRatio(prevRatio); composer.setPixelRatio(prevRatio); resize(); return data;
+    progress = saved; setMode(savedMode); renderer.setPixelRatio(prevRatio); composer.setPixelRatio(prevRatio); resize(); return data;
   };
 }
 
