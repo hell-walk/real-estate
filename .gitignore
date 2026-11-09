@@ -10,3 +10,6 @@ blender/*.blend
 blender/*.blend1
 blender/hdri/
 blender/renders/
+
+# copyrighted reference material: never in the public repository
+docs/pictures/

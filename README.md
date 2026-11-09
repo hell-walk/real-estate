@@ -79,4 +79,8 @@ Both use Three.js 0.170.0 from jsDelivr through an import map (`three` and `thre
 
 ## Design
 
-Direction from the taste-skill draw, seed 1859751874, "The place carries it": warm black ground, white ink, one gold accent, Cabinet Grotesk for display and General Sans for text (both from Fontshare), square corners on the site, pills and 12 px cards in the flat viewer's panel, no rules, no gradients, no shadows at rest. The flat viewer's panel is the paper surface from the same sheet. Structure from the landing-page-design skill: one offer, one action (book a site visit), the tagline that brightens word by word, questions as an accordion, a form with real checks.
+Since 7 November 2026 the site follows a drafting-atelier look: a cream page, paper cards, slate-blue buttons, yellow tags, Newsreader headlines over Cabinet Grotesk, and the dark board kept only for the stage frame, the menu and the footer. Tokens are at the top of `src/css/site.css`; the rules and the reasoning are in `docs/handover.md` (section 7) and `docs/case-studies-ui-ux.md`.
+
+## Hand-over
+
+`docs/handover.md` describes the project as of 10 November 2026, `docs/next-steps.md` what should happen next, and the two case-study files how the main decisions were made.
